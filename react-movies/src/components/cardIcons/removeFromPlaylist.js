@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { IconButton, Snackbar } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel'; 
-import { getAuth } from 'firebase/auth';
-import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig'; 
+
 
 const RemoveFromPlaylist = ({ movieId }) => {
   const auth = getAuth();

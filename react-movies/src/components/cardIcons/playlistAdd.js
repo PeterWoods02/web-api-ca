@@ -3,7 +3,6 @@ import React, { useContext, useState } from "react";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import IconButton from "@mui/material/IconButton";
 import { MoviesContext } from "../../contexts/moviesContext";
-import { addToPlaylist } from "../../firebase/firestore";  
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert"; 
 

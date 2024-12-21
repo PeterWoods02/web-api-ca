@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { Button, Typography, Container, Box } from "@mui/material";
-import { getPlaylistMovies } from "../firebase/firestore"; // Import the function
 import RemoveFromPlaylist from "../components/cardIcons/removeFromPlaylist"; // Import the RemoveFromPlaylist component
 import PageTemplate from "../components/templateMovieListPageNoFilter"; // Import your PageTemplate
 

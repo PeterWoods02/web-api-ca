@@ -11,7 +11,6 @@ import { styled } from "@mui/material/styles";
 import AccountCircle from "@mui/icons-material/AccountCircle"; // Import the login icon
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery"; // Import to handle media queries
-import { getAuth, onAuthStateChanged } from "firebase/auth";  // Firebase auth import
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 

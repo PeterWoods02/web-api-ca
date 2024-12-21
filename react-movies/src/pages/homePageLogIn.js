@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signUp, signIn, signOutUser } from "../firebase/firebaseAuth";
 import AuthForm from "../components/authForm";
 
 const HomePageLogIn = () => {
