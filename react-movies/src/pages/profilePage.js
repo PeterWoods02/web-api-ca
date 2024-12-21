@@ -3,71 +3,101 @@ import { useNavigate } from "react-router-dom";
 import { Button, Typography, Container, Box } from "@mui/material";
 import RemoveFromPlaylist from "../components/cardIcons/removeFromPlaylist"; // Import the RemoveFromPlaylist component
 import PageTemplate from "../components/templateMovieListPageNoFilter"; // Import your PageTemplate
+import { jwtDecode } from "jwt-decode";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null); // State to store the logged-in user info
   const [movies, setMovies] = useState([]); // State to store the playlist movies
+  const [loading, setLoading] = useState(true); // State for loading
   const navigate = useNavigate();
 
+  // Get JWT from localStorage
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      if (currentUser) {
-        setUser(currentUser); // Set user if logged in
-        getPlaylistMovies(currentUser.uid) // Fetch the playlist movies for the logged-in user
-          .then((movieDetails) => {
-            setMovies(movieDetails); // Set the movies in state
-          })
-          .catch((error) => {
-            console.error("Error fetching movies: ", error);
-          });
-      } else {
-        setUser(null); // Set to null if logged out
-        navigate("/movies/homePageLogIn"); // Redirect to login if not logged in
+    if (token) {
+      try {
+        // Decode the token to get the user info (e.g., userId)
+        const decoded = jwtDecode(token);
+        setUser(decoded); // Set the user data (like email or userId)
+
+        // Fetch the user's playlist movies based on the decoded user ID
+        getPlaylistMovies(decoded.userId); // Assuming `userId` is in the token
+      } catch (error) {
+        console.error("Error decoding token: ", error);
+        setLoading(false);
       }
-    });
-    return () => unsubscribe(); // Cleanup listener when component is unmounted
-  }, [navigate]);
+    } else {
+      // Redirect to login page if no token exists
+      navigate("/movies/homePageLogIn");
+    }
+  }, [navigate, token]);
+
+  // Function to get the user's playlist movies (from an API or backend)
+  const getPlaylistMovies = async (userId) => {
+    try {
+      // Replace with your backend API call to get movies based on the userId
+      const response = await fetch(`/api/playlist/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include JWT in Authorization header
+        },
+      });
+      const movieDetails = await response.json();
+      setMovies(movieDetails);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching movies: ", error);
+      setLoading(false);
+    }
+  };
+
+  // Function to log out
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove JWT from localStorage
+    setUser(null); // Clear user data
+    navigate("/movies/homePageLogIn"); // Redirect to login page
+  };
 
   return (
     <Container maxWidth={false} sx={{ padding: 0 }}>
-      {user ? (
+      {loading ? (
+        <Typography variant="body1">Loading...</Typography>
+      ) : user ? (
         <>
-        <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'flex-start', 
-              padding: '16px 24px', 
-              backgroundColor: '#1d1d1d', 
-              borderRadius: '8px', 
-              marginBottom: '24px' 
-            }}>
-          <Typography variant="h4" gutterBottom sx={{ color: '#bb86fc', fontWeight: 700 }}>
-            Profile Page
-          </Typography>
-          <Typography variant="h6">Welcome, {user.email || "User"}!</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              padding: "16px 24px",
+              backgroundColor: "#1d1d1d",
+              borderRadius: "8px",
+              marginBottom: "24px",
+            }}
+          >
+            <Typography variant="h4" gutterBottom sx={{ color: "#bb86fc", fontWeight: 700 }}>
+              Profile Page
+            </Typography>
+            <Typography variant="h6">Welcome, {user.email || "User"}!</Typography>
           </Box>
-          <Typography variant="h6" gutterBottom>My Saved Playlist</Typography>
-          
-        
+
+          <Typography variant="h6" gutterBottom>
+            My Saved Playlist
+          </Typography>
+
           <Button
             variant="contained"
             color="primary"
-            onClick={() => {
-              const auth = getAuth();
-              auth.signOut(); // Log out
-              navigate("/movies/homePageLogIn"); // Redirect to login
+            onClick={handleLogout}
+            sx={{
+              position: "fixed",
+              bottom: 16,
+              right: 16,
+              zIndex: 1000,
             }}
-          sx={{
-              position: 'fixed', 
-              bottom: 16, 
-              right: 16, 
-              zIndex: 1000, 
-             }}
-              >
+          >
             Log Out
-            </Button>
-
+          </Button>
 
           {/* Use PageTemplate to display movies */}
           <PageTemplate
@@ -78,13 +108,8 @@ const ProfilePage = () => {
             )}
           />
         </>
-
-        
-      ) 
-      
-      : (
-        
-        <Typography variant="body1">Loading...</Typography>
+      ) : (
+        <Typography variant="body1">Please log in to see your playlist.</Typography>
       )}
     </Container>
   );

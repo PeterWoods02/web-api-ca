@@ -8,9 +8,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import AccountCircle from "@mui/icons-material/AccountCircle"; // Import the login icon
+import AccountCircle from "@mui/icons-material/AccountCircle"; // Profile icon
 import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery"; // Import to handle media queries
+import useMediaQuery from "@mui/material/useMediaQuery"; // Media query for responsive design
+import { jwtDecode } from "jwt-decode";
+
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
@@ -45,32 +47,35 @@ const SiteHeader = () => {
     navigate("/movies/homePageLogIn"); // Navigate to the login page
   };
 
-
-  //check auth
+  // Check for a valid JWT token on mount
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser); // Set user if logged in
-      } else {
-        setUser(null); // Set to null if logged out
+    const token = localStorage.getItem("token"); // Retrieve token from localStorage
+    if (token) {
+      try {
+        const decoded = jwtDecode(token); // Decode the JWT to get user information
+        setUser({ username: decoded.username }); // Replace with your user field
+      } catch (error) {
+        console.error("Invalid token:", error);
+        setUser(null); // Set user to null if token is invalid
       }
-    });
-    return () => unsubscribe(); 
+    } else {
+      setUser(null); // No token means no user is logged in
+    }
   }, []);
 
   return (
     <>
       <AppBar position="fixed" color="secondary">
         <Toolbar>
-        
+          {/* Render profile icon or login link */}
           {user ? (
             <IconButton
               color="inherit"
-              onClick={() => navigate("/movies/profilePage")} // Navigate to profile page (if any)
+              onClick={() => navigate("/movies/profilePage")} // Navigate to profile page
               aria-label="profile"
             >
-            <AccountCircle sx={{ fontSize: 30 }} />   </IconButton>
+              <AccountCircle sx={{ fontSize: 30 }} />
+            </IconButton>
           ) : (
             <Typography
               variant="h6"
@@ -86,7 +91,6 @@ const SiteHeader = () => {
           <Typography variant="h4" sx={{ flexGrow: 1 }}>
             TMDB Client
           </Typography>
-        
 
           {/* Render menu for larger screens, else render hamburger menu */}
           {!isMobile ? (

@@ -1,54 +1,54 @@
-import React, { useState } from 'react';
-import { IconButton, Snackbar } from '@mui/material';
-import CancelIcon from '@mui/icons-material/Cancel'; 
-
+import React, { useState } from "react";
+import { IconButton, Snackbar } from "@mui/material";
+import CancelIcon from "@mui/icons-material/Cancel";
+import axios from "axios";
 
 const RemoveFromPlaylist = ({ movieId }) => {
-  const auth = getAuth();
-  const userUid = auth.currentUser?.uid; // Get the user ID from Firebase Authentication
-  const [openSnackbar, setOpenSnackbar] = useState(false); 
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleRemoveFromPlaylist = async () => {
-    if (userUid) {
-      const playlistRef = doc(db, 'playlists', userUid); // Reference to user's playlist document in Firestore
-      try {
-        // Remove movie from the 'movies' array in the playlist
-        await updateDoc(playlistRef, {
-          movies: arrayRemove(movieId),
-        });
-        console.log('Movie removed from playlist!');
+    const token = localStorage.getItem("token"); // Get JWT token from localStorage
+    if (!token) {
+      console.error("User is not authenticated");
+      return;
+    }
 
-        
-        setOpenSnackbar(true);
+    try {
+      // Make API call to remove the movie from the playlist
+      await axios.delete(`/api/playlists/${movieId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Movie removed from playlist!");
 
-        // Wait for Snackbar to show and refresh the page
-        setTimeout(() => {
-          window.location.reload(); // Refresh the page after removal
-        }, 1000); //gives one second to see snackbar
-      } catch (error) {
-        console.error('Error removing movie from playlist: ', error);
-      }
+      setOpenSnackbar(true);
+
+      // Optionally refresh or trigger state update here
+      setTimeout(() => {
+        window.location.reload(); // Refresh the page after removal
+      }, 1000);
+    } catch (error) {
+      console.error("Error removing movie from playlist: ", error);
     }
   };
 
   const handleCloseSnackbar = () => {
-    setOpenSnackbar(false); 
+    setOpenSnackbar(false);
   };
 
   return (
     <>
       <IconButton
-        color="error" 
+        color="error"
         onClick={handleRemoveFromPlaylist}
         aria-label="remove from playlist"
       >
-        <CancelIcon /> 
+        <CancelIcon />
       </IconButton>
 
       {/* Snackbar for showing movie removal success */}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={2000} 
+        autoHideDuration={2000}
         message="Movie removed from playlist!"
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}

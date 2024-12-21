@@ -24,6 +24,41 @@ const HomePageLogIn = () => {
     return true;
   };
 
+  // API Calls
+  const signUp = async (email, password) => {
+    const response = await fetch("http://localhost:8080/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Sign-up failed");
+    }
+    return await response.json(); // Returns user data
+  };
+
+  const signIn = async (email, password) => {
+    const response = await fetch("http://localhost:8080/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Sign-in failed");
+    }
+    const data = await response.json();
+    localStorage.setItem("token", data.token); // Store JWT
+    return data.user; // Returns user object
+  };
+
+  const signOut = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
+
+  // Handlers
   const handleSignUp = async () => {
     if (!validateForm()) return;
 
@@ -54,11 +89,10 @@ const HomePageLogIn = () => {
     }
   };
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     setLoading(true);
     try {
-      await signOutUser();
-      setUser(null);
+      signOut();
       navigate("/../../movies/HomePageLogIn");
     } catch (error) {
       setErrorMessage(error.message || "Sign-out failed");
