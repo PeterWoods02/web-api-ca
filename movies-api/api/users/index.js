@@ -13,22 +13,57 @@ router.get('/', async (req, res) => {
 });
 
 // register(Create)/Authenticate User
-router.post('/', asyncHandler(async (req, res) => {
+router.post('/signup', async (req, res) => {
     try {
-        if (!req.body.username || !req.body.password) {
-            return res.status(400).json({ success: false, msg: 'Username and password are required.' });
-        }
-        if (req.query.action === 'register') {
-            await registerUser(req, res);
-        } else {
-            await authenticateUser(req, res);
-        }
+      const { username, password } = req.body;
+      if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required.' });
+      }
+  
+      const existingUser = await User.findByUserName(username);
+      if (existingUser) {
+        return res.status(409).json({ message: 'Username already exists.' });
+      }
+  
+      const newUser = new User({ username, password });
+      await newUser.save();
+      res.status(201).json({ message: 'User created successfully.' });
     } catch (error) {
-        // Log the error and return a generic error message
-        console.error(error);
-        res.status(500).json({ success: false, msg: 'Internal server error.' });
+      res.status(500).json({ message: 'Error creating user.', error: error.message });
     }
-}));
+  });
+
+
+  // Login Route
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required.' });
+    }
+    try {
+      // Find the user by username
+      const user = await User.findByUserName(username);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+      // Compare the password
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid credentials.' });
+      }
+      // Generate a JWT token if credentials are correct
+      const token = jwt.sign({ id: user._id, username: user.username }, process.env.SECRET, { expiresIn: '1h' });
+      // Respond with the token
+      res.status(200).json({ message: 'Login successful', token });
+    } catch (error) {
+      res.status(500).json({ message: 'Error during login', error: error.message });
+    }
+  });
+
+  router.post('/logout', (req, res) => {
+    // Client will handle the actual token removal
+    res.status(200).json({ message: 'Logged out successfully' });
+  });
 
 // Update a user
 router.put('/:id', async (req, res) => {

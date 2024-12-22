@@ -43,7 +43,7 @@ const App = () => {
         <SiteHeader />
         <MoviesContextProvider>
           <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePageLogIn />} />
           <Route path="/movies/home" element={<HomePage />} />
             <Route path="/movies/favorites" element={<FavoriteMoviesPage />} />
             <Route path="/movies/homePageLogIn" element={<HomePageLogIn />} />

@@ -24,12 +24,11 @@ const HomePageLogIn = () => {
     return true;
   };
 
-  // API Calls
   const signUp = async (email, password) => {
-    const response = await fetch("http://localhost:8080/api/signup", {
+    const response = await fetch("http://localhost:8080/api/signup?action=register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username: email, password }),  // Backend expects 'username' and 'password'
     });
     if (!response.ok) {
       const error = await response.json();
@@ -37,21 +36,23 @@ const HomePageLogIn = () => {
     }
     return await response.json(); // Returns user data
   };
+  
 
   const signIn = async (email, password) => {
     const response = await fetch("http://localhost:8080/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username: email, password }),  // Backend expects 'username' and 'password'
     });
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || "Sign-in failed");
     }
     const data = await response.json();
-    localStorage.setItem("token", data.token); // Store JWT
-    return data.user; // Returns user object
+    localStorage.setItem("token", data.token); // Store JWT token in localStorage
+    return data.user; // Return user object
   };
+  
 
   const signOut = () => {
     localStorage.removeItem("token");
