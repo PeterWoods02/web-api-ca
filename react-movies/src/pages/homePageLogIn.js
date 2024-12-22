@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "../components/authForm";
+import { AuthContext } from "../contexts/authContext"; 
 
 const HomePageLogIn = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(""); 
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const context = useContext(AuthContext); 
 
   const validateForm = () => {
-    if (!email.includes("@")) {
-      setErrorMessage("Invalid email address");
+    if (username.trim() === "") {
+      setErrorMessage("Username is required");
       return false;
     }
     if (password.length < 6) {
@@ -24,50 +25,17 @@ const HomePageLogIn = () => {
     return true;
   };
 
-  const signUp = async (email, password) => {
-    const response = await fetch("http://localhost:8080/api/signup?action=register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: email, password }),  // Backend expects 'username' and 'password'
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Sign-up failed");
-    }
-    return await response.json(); // Returns user data
-  };
-  
-
-  const signIn = async (email, password) => {
-    const response = await fetch("http://localhost:8080/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: email, password }),  // Backend expects 'username' and 'password'
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Sign-in failed");
-    }
-    const data = await response.json();
-    localStorage.setItem("token", data.token); // Store JWT token in localStorage
-    return data.user; // Return user object
-  };
-  
-
-  const signOut = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-  };
-
-  // Handlers
+  // Handle SignUp
   const handleSignUp = async () => {
     if (!validateForm()) return;
 
     setLoading(true);
     try {
-      const userData = await signUp(email, password);
-      setUser(userData);
-      navigate("/../../movies/home");
+      const success = await context.register(username, password);  
+      if (success) {
+        context.authenticate(username, password);  
+        navigate("/movies/home"); 
+      }
     } catch (error) {
       setErrorMessage(error.message || "Sign-up failed");
     } finally {
@@ -75,14 +43,14 @@ const HomePageLogIn = () => {
     }
   };
 
+  // Handle SignIn
   const handleSignIn = async () => {
     if (!validateForm()) return;
 
     setLoading(true);
     try {
-      const userData = await signIn(email, password);
-      setUser(userData);
-      navigate("/../../movies/home");
+      await context.authenticate(username, password);  
+      navigate("/movies/home");  
     } catch (error) {
       setErrorMessage(error.message || "Sign-in failed");
     } finally {
@@ -90,11 +58,12 @@ const HomePageLogIn = () => {
     }
   };
 
+  // Handle SignOut
   const handleSignOut = () => {
     setLoading(true);
     try {
-      signOut();
-      navigate("/../../movies/HomePageLogIn");
+      context.signout();  
+      navigate("/"); 
     } catch (error) {
       setErrorMessage(error.message || "Sign-out failed");
     } finally {
@@ -104,20 +73,20 @@ const HomePageLogIn = () => {
 
   return (
     <div style={{ padding: "30px", maxWidth: "500px", margin: "0 auto" }}>
-      {user ? (
+      {context.isAuthenticated ? (
         <>
-          <h2>Welcome, {user.email}</h2>
+          <h2>Welcome, {context.userName}</h2>
           <button onClick={handleSignOut} disabled={loading}>
             {loading ? "Signing Out..." : "Sign Out"}
           </button>
         </>
       ) : (
         <AuthForm
-          email={email}
+          username={username}  
           password={password}
           loading={loading}
           errorMessage={errorMessage}
-          onEmailChange={(e) => setEmail(e.target.value)}
+          onUsernameChange={(e) => setUsername(e.target.value)}  
           onPasswordChange={(e) => setPassword(e.target.value)}
           onSignUp={handleSignUp}
           onSignIn={handleSignIn}

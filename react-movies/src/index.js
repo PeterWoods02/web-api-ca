@@ -22,6 +22,7 @@ import HomePageLogIn from "./pages/homePageLogIn"; // Your home page with authen
 import theme from "./themes/theme"
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import AuthContextProvider from './contexts/authContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +42,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <SiteHeader />
+        <AuthContextProvider>
         <MoviesContextProvider>
           <Routes>
           <Route path="/" element={<HomePageLogIn />} />
@@ -61,6 +63,7 @@ const App = () => {
             <Route path="/reviews/form" element={ <AddMovieReviewPage /> } />
           </Routes>
         </MoviesContextProvider>
+        </AuthContextProvider>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

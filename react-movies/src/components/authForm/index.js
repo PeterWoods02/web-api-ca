@@ -1,11 +1,11 @@
 import React from "react";
 
 const AuthForm = ({
-  email = "",
+  username = "", // Changed from 'email' to 'username'
   password = "",
   loading = false,
   errorMessage = "",
-  onEmailChange = () => {},
+  onUsernameChange = () => {}, // Changed from 'onEmailChange' to 'onUsernameChange'
   onPasswordChange = () => {},
   onSignUp = () => {},
   onSignIn = () => {},
@@ -39,12 +39,12 @@ const AuthForm = ({
         <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>
       )}
 
-      {/* Email Input */}
+      {/* Username Input */}
       <input
-        type="email"
-        value={email}
-        onChange={onEmailChange}
-        placeholder="Email"
+        type="text" // Changed to 'text' for username
+        value={username}
+        onChange={onUsernameChange} // Update with 'onUsernameChange'
+        placeholder="Username" // Changed placeholder to 'Username'
         style={inputStyle}
         disabled={loading}
       />
