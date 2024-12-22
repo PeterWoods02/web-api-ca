@@ -12,7 +12,8 @@ const ProfilePage = () => {
   const navigate = useNavigate();
 
   // Get JWT from localStorage
-  const token = localStorage.getItem("token");
+  const token = window.localStorage.getItem("token");
+ 
 
   useEffect(() => {
     if (token) {
@@ -36,13 +37,18 @@ const ProfilePage = () => {
   // Function to get the user's playlist movies (from an API or backend)
   const getPlaylistMovies = async (userId) => {
     try {
-      // Replace with your backend API call to get movies based on the userId
       const response = await fetch(`/api/playlist/${userId}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Include JWT in Authorization header
+          Authorization: `Bearer ${token}`,
         },
       });
-      const movieDetails = await response.json();
+  
+      // Log the raw response to see what it contains
+      const text = await response.text(); // Read the response as text
+      console.log(text); // Log the raw response
+  
+      // Try to parse as JSON only if it seems to be valid JSON
+      const movieDetails = JSON.parse(text); // This will throw an error if it's not valid JSON
       setMovies(movieDetails);
       setLoading(false);
     } catch (error) {
