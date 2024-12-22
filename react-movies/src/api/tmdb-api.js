@@ -1,20 +1,14 @@
 export const getMovies = async () => {
-  const token = localStorage.getItem('customJWT'); // Get the custom JWT from localStorage
-
-  const response = await fetch('http://localhost:8080/api/movies', {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`, // Attach custom JWT in the Authorization header
-    },
-  });
-
-  if (response.ok) {
-    const movies = await response.json();
-    return movies; // Return movies
-  } else {
-    throw new Error("Failed to fetch movies");
-  }
+  const response = await fetch(
+    'http://localhost:8080/api/movies', {
+      headers: {
+        'Authorization': `Bearer ${window.localStorage.getItem('token')}`
+      }
+    }
+  );
+  return response.json();
 };
+
 
 
   
