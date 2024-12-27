@@ -1,7 +1,14 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
+
 const Schema = mongoose.Schema;
+
+const movieSchema = new Schema({
+  movieId: { type: String, required: true },
+  title: { type: String, required: true },
+  
+});
 
 const UserSchema = new Schema({
   username: { type: String, unique: true, required: true},
@@ -15,7 +22,14 @@ const UserSchema = new Schema({
       message: 'Password must be at least 8 characters long and include one letter, one number, and one special character.',
     },
   },
+  playlist: [
+  {
+    movieId: { type: String },
+    title: { type: String },
+  },
+  ],
 });
+
 
 UserSchema.methods.comparePassword = async function (passw) { 
   return await bcrypt.compare(passw, this.password); 

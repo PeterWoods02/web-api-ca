@@ -7,27 +7,26 @@ const RemoveFromPlaylist = ({ movieId }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleRemoveFromPlaylist = async () => {
-    const token = localStorage.getItem("token"); // Get JWT token from localStorage
-    if (!token) {
-      console.error("User is not authenticated");
-      return;
-    }
-
     try {
-      // Make API call to remove the movie from the playlist
-      await axios.delete(`/api/playlists/${movieId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem('token');  // Get token from local storage
+      const response = await fetch(`/api/users/playlist/${movieId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // Add token to Authorization header
+        },
       });
-      console.log("Movie removed from playlist!");
-
-      setOpenSnackbar(true);
-
-      // Optionally refresh or trigger state update here
-      setTimeout(() => {
-        window.location.reload(); // Refresh the page after removal
-      }, 1000);
+  
+      if (!response.ok) {
+        throw new Error('Failed to remove movie from playlist');
+      }
+  
+      const result = await response.json();
+      console.log(result.message);  // Handle success
+      return result;
     } catch (error) {
-      console.error("Error removing movie from playlist: ", error);
+      console.error('Error removing from playlist:', error.message);
+      throw error;
     }
   };
 
