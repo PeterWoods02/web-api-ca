@@ -23,6 +23,7 @@ import theme from "./themes/theme"
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import AuthContextProvider from './contexts/authContext';
+import PrivateRoute from './protectedRoutes';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,8 +47,8 @@ const App = () => {
         <MoviesContextProvider>
           <Routes>
           <Route path="/" element={<HomePageLogIn />} />
-          <Route path="/movies/home" element={<HomePage />} />
-            <Route path="/movies/favorites" element={<FavoriteMoviesPage />} />
+          <Route path="/movies/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/movies/favorites" element={<PrivateRoute><FavoriteMoviesPage /></PrivateRoute>} />
             <Route path="/movies/homePageLogIn" element={<HomePageLogIn />} />
             <Route path="/movies/upcoming" element={<UpcomingMoviesPage />} />
             <Route path="/movies/topRated" element={<TopRatedMovies />} />
