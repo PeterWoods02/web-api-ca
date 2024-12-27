@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -11,14 +11,13 @@ import { styled } from "@mui/material/styles";
 import AccountCircle from "@mui/icons-material/AccountCircle"; // Profile icon
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery"; // Media query for responsive design
-import { jwtDecode } from "jwt-decode";
-
+import { AuthContext } from "../../contexts/authContext"; // Import AuthContext
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
 const SiteHeader = () => {
+  const { isAuthenticated, signout, userName } = useContext(AuthContext); // Access context
   const [anchorEl, setAnchorEl] = useState(null);
-  const [user, setUser] = useState(null);
   const open = Boolean(anchorEl);
 
   const navigate = useNavigate();
@@ -44,31 +43,21 @@ const SiteHeader = () => {
 
   // Function to handle login icon click
   const handleLoginClick = () => {
-    navigate("/movies/homePageLogIn"); // Navigate to the login page
+    navigate("/movies/homePageLogIn"); 
   };
 
-  // Check for a valid JWT token on mount
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // Retrieve token from localStorage
-    if (token) {
-      try {
-        const decoded = jwtDecode(token); // Decode the JWT to get user information
-        setUser({ username: decoded.username }); // Replace with your user field
-      } catch (error) {
-        console.error("Invalid token:", error);
-        setUser(null); // Set user to null if token is invalid
-      }
-    } else {
-      setUser(null); // No token means no user is logged in
-    }
-  }, []);
+  // Handle logout
+  const handleLogout = () => {
+    signout(); 
+    navigate("/movies/homePageLogIn"); 
+  };
 
   return (
     <>
       <AppBar position="fixed" color="secondary">
         <Toolbar>
           {/* Render profile icon or login link */}
-          {user ? (
+          {isAuthenticated ? (
             <IconButton
               color="inherit"
               onClick={() => navigate("/movies/profilePage")} // Navigate to profile page
@@ -141,6 +130,13 @@ const SiteHeader = () => {
                 ))}
               </Menu>
             </>
+          )}
+
+          {/* logout for logged in users */}
+          {isAuthenticated && (
+            <IconButton onClick={handleLogout} color="inherit">
+              Log Out
+            </IconButton>
           )}
         </Toolbar>
       </AppBar>

@@ -10,28 +10,19 @@ const AuthContextProvider = (props) => {
   const [userName, setUserName] = useState("");
 
   // Function to set JWT token in localStorage
- const setToken = (data) => {
+  const setToken = (data) => {
     localStorage.setItem("token", data);
     setAuthToken(data);
-    setIsAuthenticated(true);
   };
 
   const authenticate = async (username, password) => {
-    try {
-      const result = await signIn(username, password);
-      console.log("API Response:", result); // Log response
-      if (result.token) {
-        setToken(result.token);
-        setUserName(username);
-      } else {
-        throw new Error("Invalid credentials or missing token");
-      }
-    } catch (error) {
-      console.error("Authentication error:", error);
-      throw error;
+    const result = await signIn(username, password);
+    if (result.token) {
+      setToken(result.token);
+      setIsAuthenticated(true);
+      setUserName(username);
     }
   };
-  
 
   const register = async (username, password) => {
     const result = await signUp(username, password);
