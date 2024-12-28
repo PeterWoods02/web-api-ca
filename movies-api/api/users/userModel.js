@@ -1,14 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-
 const Schema = mongoose.Schema;
-
-const movieSchema = new Schema({
-  movieId: { type: String, required: true },
-  title: { type: String, required: true },
-  
-});
 
 const UserSchema = new Schema({
   username: { type: String, unique: true, required: true},

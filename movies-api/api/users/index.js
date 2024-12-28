@@ -85,7 +85,6 @@ router.post('/playlist', verifyToken, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
     user.playlist.push(movie);
     await user.save();
 
@@ -115,16 +114,16 @@ router.delete('/playlist/:movieId', verifyToken, async (req, res) => {
 });
 
 
-router.get('/playlist/:userId', verifyToken, async (req, res) => {
+router.get('/playlist', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id); 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const movie = await Movie.findByMovieDBId(req.params.id); // Find movie by its `id` field in MongoDB
+    if (!movie) {
+      return res.status(404).send('Movie not found');
     }
-    res.status(200).json(user.playlist);
+    res.json(movie); // Return the full movie object as JSON
   } catch (error) {
-    console.error('Error fetching playlist:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error retrieving movie:', error);
+    res.status(500).send('Server error');
   }
 });
 
