@@ -23,7 +23,7 @@ const ProfilePage = () => {
         setUser(decoded); // Set the user data (like email or userId)
 
         // Fetch the user's playlist movies based on the decoded user ID
-        getPlaylistMovies(decoded.userId); // Assuming `userId` is in the token
+        getPlaylistMovies(decoded.id); // Assuming `userId` is in the token
       } catch (error) {
         console.error("Error decoding token: ", error);
         setLoading(false);
@@ -37,26 +37,32 @@ const ProfilePage = () => {
   // Function to get the user's playlist movies (from an API or backend)
   const getPlaylistMovies = async (userId) => {
     try {
-      const response = await fetch(`/api/playlist/${userId}`, {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/api/users/playlist/${userId}`, {
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
   
-      // Log the raw response to see what it contains
-      const text = await response.text(); // Read the response as text
-      console.log(text); // Log the raw response
+      if (!response.ok) {
+        console.error(`Failed to fetch movies. Status: ${response.status}`);
+        throw new Error('Failed to fetch movies');
+      }
   
-      // Try to parse as JSON only if it seems to be valid JSON
-      const movieDetails = JSON.parse(text); // This will throw an error if it's not valid JSON
-      setMovies(movieDetails);
+      const movies = await response.json();
+      console.log('Fetched movies:', movies); // Check if this data is what you expect
+  
+      // Set movies data to state
+      setMovies(movies);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching movies: ", error);
+      console.error('Error fetching movies:', error);
       setLoading(false);
     }
   };
 
+  
   // Function to log out
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove JWT from localStorage

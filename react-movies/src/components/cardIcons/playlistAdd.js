@@ -16,26 +16,30 @@ const AddPlaylistAddIcon = ({ movie }) => {
   // Mock function for adding movie to the playlist (you can replace this later with Firebase functionality)
   const addToPlaylist = async (movie) => {
     const token = localStorage.getItem('token');
+    console.log("Movie data being added:", movie);  // Log the movie object
+  
     try {
       const response = await fetch('http://localhost:8080/api/users/playlist/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,  // Attach the token in the header
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ movie }), // Send the movie data
+        body: JSON.stringify({ movie }),  // Send the movie object
       });
   
       const data = await response.json();
+      console.log("Server response:", response.status, data);  // Log response
       if (response.ok) {
-        console.log('Movie added to playlist:', data);
+        console.log('Movie added to playlist successfully:', data);
       } else {
-        console.error('Failed to add movie:', data.message);
+        console.error('Error from server:', data.message);
       }
     } catch (error) {
-      console.error('Error adding movie to playlist:', error);
+      console.error('Error in fetch request:', error.message);
     }
   };
+  
   
   
 

@@ -22,12 +22,7 @@ const UserSchema = new Schema({
       message: 'Password must be at least 8 characters long and include one letter, one number, and one special character.',
     },
   },
-  playlist: [
-  {
-    movieId: { type: String },
-    title: { type: String },
-  },
-  ],
+  playlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }]
 });
 
 
