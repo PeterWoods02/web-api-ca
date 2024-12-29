@@ -101,3 +101,16 @@ export const searchMovies = async (query, page = 1) => {
   const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=en-US&page=${page}`;
   return await fetchWithErrorHandling(url);
 };
+
+// Fetch actor details by name
+export const fetchActorId = async (actorName) => {
+    const url = `https://api.themoviedb.org/3/search/person?query=${actorName}&api_key=${API_KEY}&include_adult=false`;
+    return await fetchWithErrorHandling(url);
+};
+
+// Get movies for actor (using actor ID)
+export const getMoviesForActor = async (actorId) => {
+  const url = `https://api.themoviedb.org/3/person/${actorId}/movie_credits?api_key=${API_KEY}&language=en-US`;
+  const data = await fetchWithErrorHandling(url);
+  return data.cast || [];
+};
