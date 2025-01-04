@@ -123,18 +123,21 @@ router.delete('/playlist/:movieId', verifyToken, async (req, res) => {
 });
 
 
+// Get all movies in the user's playlist
 router.get('/playlist', verifyToken, async (req, res) => {
   try {
-    const movie = await Movie.findByMovieDBId(req.params.id); // Find movie by its `id` field in MongoDB
-    if (!movie) {
-      return res.status(404).send('Movie not found');
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
-    res.json(movie); // Return the full movie object as JSON
+    res.status(200).json({ playlist: user.playlist });
   } catch (error) {
-    console.error('Error retrieving movie:', error);
-    res.status(500).send('Server error');
+    console.error('Error retrieving playlist:', error);
+    res.status(500).json({ message: 'Error retrieving playlist', error: error.message });
   }
 });
+
 
 
 export default router;

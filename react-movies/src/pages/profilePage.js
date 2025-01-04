@@ -23,7 +23,7 @@ const ProfilePage = () => {
         setUser(decoded); // Set the user data (like email or userId)
 
         // Fetch the user's playlist movies based on the decoded user ID
-        getPlaylistMovies(decoded.id); // Assuming `userId` is in the token
+        getPlaylistMovies(); 
       } catch (error) {
         console.error("Error decoding token: ", error);
         setLoading(false);
@@ -35,10 +35,10 @@ const ProfilePage = () => {
   }, [navigate, token]);
 
   // Function to get the user's playlist movies (from an API or backend)
-  const getPlaylistMovies = async (userId) => {
+  const getPlaylistMovies = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/users/playlist/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/users/playlist/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -50,11 +50,10 @@ const ProfilePage = () => {
         throw new Error('Failed to fetch movies');
       }
   
-      const movies = await response.json();
-      console.log('Fetched movies:', movies); // Check if this data is what you expect
-  
+     
+      const data = await response.json();
       // Set movies data to state
-      setMovies(movies);
+      setMovies(data.playlist || []);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching movies:', error);

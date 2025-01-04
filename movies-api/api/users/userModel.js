@@ -5,16 +5,17 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
   username: { type: String, unique: true, required: true},
-  /*password: {
+  password: {
     type: String,
-    required: [true, 'Password is required.'],
+    required: true,
+    minlength: 8,  
     validate: {
-      validator: function (value) {
-        return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(value);
+      validator: function(value) {
+        return /[!@#$%^&*(),.?":{}|<>]/.test(value);
       },
-      message: 'Password must be at least 8 characters long and include one letter, one number, and one special character.',
-    },
-  },*/
+      message: 'Password must contain at least one special character.'
+    }
+  },
   playlist: [
     {
       adult: Boolean,
