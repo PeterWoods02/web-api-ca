@@ -81,7 +81,7 @@ export default function MovieCard({ movie, action }) {
       </Link>
 
       {/*Rate Button */}
-      <Link to={`/movies/${movie.id}/ratings`}>
+      <Link to={`/rating/${movie.id}`}>
           <Button variant="outlined" size="medium" color="secondary">
             Rate  <StarRateIcon fontSize="small" sx={{ color: '#f0bd30' }}/>
           </Button>

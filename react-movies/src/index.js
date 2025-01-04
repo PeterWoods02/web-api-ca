@@ -68,7 +68,7 @@ const App = () => {
                 <Route element={<PrivateRoute />}>
                   <Route path="/movies/home" element={<HomePage />} />
                   <Route path="/movies/favorites" element={<FavoriteMoviesPage />} />
-                  <Route path="/movies/:id/ratings" element={<RatingPage />} />
+                  <Route path="/rating/:id" element={<RatingPage />} />
                 </Route>
 
               </Routes>

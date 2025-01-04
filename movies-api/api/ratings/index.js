@@ -50,7 +50,7 @@ router.get('/rating/:movieId', async (req, res) => {
 
 // Add or update rating for a movie
 router.post('/rating', verifyToken, async (req, res) => {
-    const { movieId, rating } = req.body;
+    const { movieId, rating, review } = req.body;  // Now accepting the review
     const userId = req.user.id; 
   
     if (!movieId || !rating) {
@@ -64,14 +64,15 @@ router.post('/rating', verifyToken, async (req, res) => {
       let existingRating = await Rating.findOne({ movieId, userId });
   
       if (existingRating) {
-        // If rating already exists, update it
+        // If rating already exists, update it with the review as well
         existingRating.rating = rating;
+        existingRating.review = review || existingRating.review;  // Update review if provided
         await existingRating.save();
         return res.status(200).json({ message: 'Rating updated successfully', rating: existingRating });
       }
   
-      // If no existing rating, create a new one
-      const newRating = new Rating({ movieId, userId, rating });
+      // If no existing rating, create a new one with the review
+      const newRating = new Rating({ movieId, userId, rating, review });
       await newRating.save();
       
       return res.status(201).json({ message: 'Rating added successfully', rating: newRating });
