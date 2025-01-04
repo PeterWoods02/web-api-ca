@@ -82,7 +82,7 @@ router.get('/tmdb/all', authenticate, asyncHandler(async (req, res) => {
 }));
 
 // Get movie images by ID
-router.get('/tmdb/:id/images', asyncHandler(async (req, res) => {
+router.get('/tmdb/images/:id', asyncHandler(async (req, res) => {
     const { id } = req.params;
     const images = await getMovieImages(id);
     res.status(200).json(images);
@@ -142,5 +142,19 @@ router.get('/tmdb/actor/:actorId/movies', asyncHandler(async (req, res) => {
         res.status(404).json({ message: `Movies for actor with ID ${actorId} not found`, error: error.message });
     }
 }));
+
+// Get movie actors (credits) by movie ID
+router.get('/tmdb/actors/:id', asyncHandler(async (req, res) => {
+    const { id } = req.params; 
+    try {
+      const actors = await getMovieActors(id);
+      res.status(200).json(actors);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching movie actors', error: error.message });
+    }
+  }));
+  
+
+
 
 export default router;
