@@ -1,23 +1,27 @@
-import React from 'react';
+import React from "react";
+import { Card, CardContent, Avatar, Typography, Box } from "@mui/material";
 
 const UserRatingsList = ({ ratings }) => {
-  // Ensure ratings is always an array (even if it's undefined or null)
-  const safeRatings = Array.isArray(ratings) ? ratings : [];
-
   return (
-    <div>
-      {safeRatings.length === 0 ? (
-        <p>No ratings available.</p>
-      ) : (
-        safeRatings.map((rating) => (
-          <div key={rating._id}>
-            {/* Render rating details here */}
-            <p>Rating: {rating.rating}</p>
-            <p>Review: {rating.review}</p>
-          </div>
-        ))
-      )}
-    </div>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {ratings.map((rating) => (
+        <Card key={rating._id} sx={{ display: "flex", padding: 2, backgroundColor: "#333", borderRadius: 2 }}>
+          {/* Profile picture and user info */}
+          <Avatar sx={{ width: 56, height: 56, backgroundColor: "#bb86fc" }} />
+          <Box sx={{ marginLeft: 2, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <Typography variant="body1" sx={{ color: "#fff", fontWeight: 600 }}>
+              {rating.userId ? rating.userId : "Anonymous"} {/* Fallback username will add real username later */}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "#bbb" }}>
+              Rating: {rating.rating} / 10
+            </Typography>
+            <Typography variant="body2" sx={{ color: "#bbb", marginTop: 1 }}>
+              Review: {rating.review || "No review provided"}
+            </Typography>
+          </Box>
+        </Card>
+      ))}
+    </Box>
   );
 };
 

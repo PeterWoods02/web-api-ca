@@ -13,6 +13,7 @@ const RatingsPage = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false); 
   const [snackbarMessage, setSnackbarMessage] = useState(""); 
   const navigate = useNavigate(); 
+  const [title, setMovieName] = useState("");
 
   const token = window.localStorage.getItem("token");
 
@@ -25,6 +26,7 @@ const RatingsPage = () => {
 
         // Fetch movie ratings based on the movieId from URL
         getMovieRatings();
+        getMovieDetails();
       } catch (error) {
         console.error("Error decoding token:", error);
         setLoading(false);
@@ -59,7 +61,27 @@ const RatingsPage = () => {
       };
       
       
-      
+      const getMovieDetails = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("No authentication token found.");
+            
+            const response = await fetch(`http://localhost:8080/api/movies/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            });
+        
+            if (!response.ok) throw new Error(`Failed to fetch ratings: ${response.statusText}`);
+            
+    
+          const data = await response.json();
+            const movieTitle = data.title;
+            setMovieName(movieTitle);
+        } catch (error) {
+          console.error("Error fetching movie details:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
     
      
   // Handle closing of the Snackbar
@@ -86,6 +108,7 @@ const RatingsPage = () => {
         <Typography variant="body1">Loading...</Typography>
       ) : user ? (
         <>
+        <Box sx={{ marginBottom: 6 }} />   
           <Box
             sx={{
               display: "flex",
@@ -98,14 +121,12 @@ const RatingsPage = () => {
             }}
           >
             <Typography variant="h4" gutterBottom sx={{ color: "#bb86fc", fontWeight: 700 }}>
-              Movie Ratings Page
-            </Typography>
-            <Typography variant="h6">Welcome, {user.email || "User"}!</Typography>
+            {title || "Loading..."} 
+          </Typography>
           </Box>
 
-          <Typography variant="h6" gutterBottom>
-            Ratings for Movie {id}
-          </Typography>
+           
+           
 
           <Button
             variant="contained"
@@ -123,6 +144,8 @@ const RatingsPage = () => {
 
           {/* RatingForm component for submitting new ratings */}
           <RatingForm movieId={id} fetchRatings={getMovieRatings} showSnackbar={showSnackbar} />
+
+          <Box sx={{ marginBottom: 6 }} />   
 
           {/* Display the list of ratings */}
           {ratings.length > 0 ? (

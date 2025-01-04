@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button, Typography } from "@mui/material";
+import { TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
@@ -78,6 +78,7 @@ const RatingForm = ({  movieId, fetchRatings, showSnackbar  }) => {
           rows={4}
           fullWidth
         />
+        <Box sx={{ marginBottom: 2 }} />   
         <Button type="submit" variant="contained">Submit Rating</Button>
       </form>
     </div>
