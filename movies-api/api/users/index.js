@@ -77,14 +77,19 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Add movie to user's playlist
 router.post('/playlist', verifyToken, async (req, res) => {
-  const { movie } = req.body;
   try {
+    const { movie } = req.body;
     const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Check if movie already exists in the playlist
+    if (user.playlist.some((m) => m.id === movie.id)) {
+      return res.status(400).json({ message: 'Movie already in playlist' });
     }
+
+    // Add movie to playlist
     user.playlist.push(movie);
     await user.save();
 
@@ -93,6 +98,10 @@ router.post('/playlist', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Error adding movie to playlist', error: error.message });
   }
 });
+
+
+
+
 
 // Remove movie from user's playlist
 router.delete('/playlist/:movieId', verifyToken, async (req, res) => {

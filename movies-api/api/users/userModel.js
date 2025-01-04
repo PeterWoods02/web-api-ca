@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
   username: { type: String, unique: true, required: true},
-  password: {
+  /*password: {
     type: String,
     required: [true, 'Password is required.'],
     validate: {
@@ -14,8 +14,26 @@ const UserSchema = new Schema({
       },
       message: 'Password must be at least 8 characters long and include one letter, one number, and one special character.',
     },
-  },
-  playlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }]
+  },*/
+  playlist: [
+    {
+      adult: Boolean,
+      backdrop_path: String,
+      genre_ids: [Number],
+      id: Number, 
+      original_language: String,
+      original_title: String,
+      overview: String,
+      popularity: Number,
+      poster_path: String,
+      release_date: String,
+      title: String,
+      video: Boolean,
+      vote_average: Number,
+      vote_count: Number,
+      favorite: Boolean,
+    },
+  ],
 });
 
 

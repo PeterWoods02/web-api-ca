@@ -10,8 +10,10 @@ import { AuthContext } from "../../contexts/authContext";
 const AddPlaylistAddIcon = ({ movie }) => {
   const [isAdded, setIsAdded] = useState(false); 
   const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const { isAuthenticated, userName } = useContext(AuthContext);
+  
 
   // Mock function for adding movie to the playlist (you can replace this later with Firebase functionality)
   const addToPlaylist = async (movie) => {
@@ -27,13 +29,13 @@ const AddPlaylistAddIcon = ({ movie }) => {
       });
   
       const data = await response.json();
-      if (response.ok) {
-        console.log('Movie added to playlist:', data);
-      } else {
-        console.error('Failed to add movie:', data.message);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong");
       }
+      return data; 
     } catch (error) {
-      console.error('Error adding movie to playlist:', error);
+      throw error; 
     }
   };
   
@@ -44,6 +46,7 @@ const AddPlaylistAddIcon = ({ movie }) => {
     if (!isAuthenticated) {
       setIsError(true);
       setOpenSnackbar(true);
+      
       return; // Exit early if not authenticated
     }
 
@@ -51,14 +54,21 @@ const AddPlaylistAddIcon = ({ movie }) => {
       await addToPlaylist(movie); // Call the API function
       setIsAdded(true);
       setIsError(false);
+      setErrorMessage("");
       setOpenSnackbar(true);
     } catch (error) {
-      setIsError(true);
       setIsAdded(false);
-      console.error("Error adding to playlist:", error);
+      setIsError(true);
+      
+  
+      if (error.message === "Movie already in playlist") {
+        setErrorMessage("This movie is already in your playlist.");
+      } else {
+        setErrorMessage("Error adding to playlist. Please try again.");
+      }
       setOpenSnackbar(true);
-    }
-  };
+  }
+};
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -81,7 +91,7 @@ const AddPlaylistAddIcon = ({ movie }) => {
           severity={isError ? "error" : "success"}
           sx={{ width: "100%" }}
         >
-          {isError ? "Error adding to playlist!" : "Movie added to playlist!"}
+          {errorMessage || isError ? "Error adding to playlist!" : "Movie added to playlist!"}
         </Alert>
       </Snackbar>
     </div>
