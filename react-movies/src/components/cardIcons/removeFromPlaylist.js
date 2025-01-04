@@ -3,13 +3,18 @@ import { IconButton, Snackbar } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import axios from "axios";
 
-const RemoveFromPlaylist = ({ movieId }) => {
+const RemoveFromPlaylist = ({ movieId, getPlaylist, showSnackbar  }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isError, setIsError] = useState(false);  
+  const [message, setMessage] = useState("");  
 
   const handleRemoveFromPlaylist = async () => {
     try {
-      const token = localStorage.getItem('token');  // Get token from local storage
-      const response = await fetch(`/api/users/playlist/${movieId}`, {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No token found. Please log in.");
+      }
+      const response = await fetch(`http://localhost:8080/api/users/playlist/${movieId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -23,12 +28,22 @@ const RemoveFromPlaylist = ({ movieId }) => {
   
       const result = await response.json();
       console.log(result.message);  // Handle success
-      return result;
+      getPlaylist();
+
+      // Show success message
+      setMessage("Movie removed from playlist!");
+      setOpenSnackbar(true);
+      showSnackbar("Movie removed from playlist!");
     } catch (error) {
-      console.error('Error removing from playlist:', error.message);
-      throw error;
+      console.error("Error removing from playlist:", error);
+
+      // Show error message
+      setMessage(error.message || "Error removing movie");
+      setOpenSnackbar(true);
+      showSnackbar("Failed to remove movie from playlist");
     }
   };
+
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);

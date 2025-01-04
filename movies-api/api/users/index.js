@@ -105,22 +105,32 @@ router.post('/playlist', verifyToken, async (req, res) => {
 
 // Remove movie from user's playlist
 router.delete('/playlist/:movieId', verifyToken, async (req, res) => {
-  const { movieId } = req.params;
-
+  const { movieId } = req.params;  
   try {
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.playlist = user.playlist.filter((movie) => movie.movieId !== movieId);
+    const movieIndex = user.playlist.findIndex((movie) => movie.id === parseInt(movieId)); // Compare movieId with 'id'
+    
+    if (movieIndex === -1) {
+      return res.status(404).json({ message: 'Movie not found in playlist' });
+    }
+    user.playlist.splice(movieIndex, 1);
     await user.save();
 
-    res.status(200).json({ message: 'Movie removed from playlist' });
+    // Respond with a success message
+    res.status(200).json({ message: 'Movie removed from playlist', playlist: user.playlist });
   } catch (error) {
+    console.error('Error removing movie from playlist:', error);
     res.status(500).json({ message: 'Error removing movie from playlist', error: error.message });
   }
 });
+
+
+
+
 
 
 // Get all movies in the user's playlist

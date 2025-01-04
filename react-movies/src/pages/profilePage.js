@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Typography, Container, Box } from "@mui/material";
+import { Button, Typography, Container, Box, Snackbar } from "@mui/material";
 import RemoveFromPlaylist from "../components/cardIcons/removeFromPlaylist"; // Import the RemoveFromPlaylist component
 import PageTemplate from "../components/templateMovieListPageNoFilter"; // Import your PageTemplate
 import { jwtDecode } from "jwt-decode";
@@ -9,6 +9,8 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null); // State to store the logged-in user info
   const [movies, setMovies] = useState([]); // State to store the playlist movies
   const [loading, setLoading] = useState(true); // State for loading
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // State to control Snackbar visibility
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // State to hold the Snackbar message
   const navigate = useNavigate();
 
   // Get JWT from localStorage
@@ -69,6 +71,17 @@ const ProfilePage = () => {
     navigate("/movies/homePageLogIn"); // Redirect to login page
   };
 
+  // Function to handle snackbar close
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  // Function to show snackbar after movie is removed
+  const showSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
   return (
     <Container maxWidth={false} sx={{ padding: 0 }}>
       {loading ? (
@@ -115,9 +128,23 @@ const ProfilePage = () => {
             title="My Playlist"
             movies={movies} // Pass the movies array to the PageTemplate
             action={(movie) => (
-              <RemoveFromPlaylist movieId={movie.id} /> // Render RemoveFromPlaylist button for each movie
+              <RemoveFromPlaylist
+                movieId={movie.id} 
+                getPlaylist={getPlaylistMovies}
+                showSnackbar={showSnackbar} 
+              />
             )}
           />
+
+            {/* Snackbar to show the success message */}
+            <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={2000}
+            message={snackbarMessage}
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          />
+
         </>
       ) : (
         <Typography variant="body1">Please log in to see your playlist.</Typography>
