@@ -72,9 +72,6 @@ export default function MovieCard({ movie, action }) {
         </Grid>
       </CardContent>
       <CardActions disableSpacing>
-
-        
-    
       {action(movie)}
     
       <Link to={`/movies/${movie.id}`}>
@@ -82,6 +79,13 @@ export default function MovieCard({ movie, action }) {
           More Info ...
         </Button>
       </Link>
+
+      {/*Rate Button */}
+      <Link to={`/movies/${movie.id}/ratings`}>
+          <Button variant="outlined" size="medium" color="secondary">
+            Rate  <StarRateIcon fontSize="small" sx={{ color: '#f0bd30' }}/>
+          </Button>
+        </Link>
       
     </CardActions>
     </Card>
