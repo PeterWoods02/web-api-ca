@@ -5,8 +5,51 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router(); // eslint-disable-line
 
+// Verify Token Middleware
+const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1]; // Extract token from Authorization header
+
+  if (!token) {
+    console.log('No token provided');
+    return res.status(403).json({ message: 'No token provided' });
+  }
+
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    if (err) {
+      console.log('Token verification failed:', err.message);
+      return res.status(403).json({ message: 'Invalid or expired token' });
+    }
+    console.log('Decoded token:', decoded); // Log the decoded token
+    req.user = decoded; // Attach decoded user data to request
+    next();
+  });
+};
+
+// Get all ratings for a specific movie
+router.get('/rating/:movieId', async (req, res) => {
+    const { movieId } = req.params;
+  
+    if (!movieId) {
+      return res.status(400).json({ message: 'MovieId is required' });
+    }
+    try {
+      const ratings = await Rating.find({ movieId });
+  
+      if (!ratings || ratings.length === 0) {
+        return res.status(404).json({ message: 'No ratings found for this movie' });
+      }
+  
+      // Return the list of ratings
+      return res.status(200).json({ ratings });
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
+      return res.status(500).json({ message: 'Error fetching ratings', error: error.message });
+    }
+  });
+  
+
 // Add or update rating for a movie
-router.post('/rating', async (req, res) => {
+router.post('/rating', verifyToken, async (req, res) => {
     const { movieId, rating } = req.body;
     const userId = req.user.id; 
   
