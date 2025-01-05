@@ -271,34 +271,70 @@ export const getMovieDetails = async (movieId) => {
 };
 
 
-
-
-// Get user details
 export const getUserDetails = async (userId) => {
   const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
     headers: {
-      'Authorization': `Bearer ${window.localStorage.getItem('token')}`
-    }
+      'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+    },
   });
   if (!response.ok) {
-    throw new Error(await response.json().message);
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'User details not found');
   }
-  const data = await response.json();
-  return data;
+  return response.json();
 };
 
-// Get user reviews
-export const getUserReviews = async (userId) => {
-  const response = await fetch(`http://localhost:8080/api/rating/user/${userId}`, {
-    headers: {
-      'Authorization': `Bearer ${window.localStorage.getItem('token')}`
+export const getUserRatings = async (userId) => {
+    const token = window.localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Authorization token is missing. Please log in.');
     }
-  });
-  if (!response.ok) {
-    throw new Error(await response.json().message);
-  }
-  const data = await response.json();
-  return data.ratings; 
-};
+  
+    const response = await fetch(`http://localhost:8080/api/rating/user/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'User reviews not found');
+    }
+  
+    const data = await response.json();
+    
+    // Return the reviews directly from the 'ratings' key
+    return data.ratings || [];
+  };
+  
+  
+  
 
+
+// Fetch playlist movies function
+export const getPlaylistMovies = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No token found');
+
+    const response = await fetch(`http://localhost:8080/api/users/playlist/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch movies. Status: ${response.status}`);
+      throw new Error('Failed to fetch movies');
+    }
+
+    const data = await response.json();
+    return data.playlist || []; // Return the playlist array
+  } catch (error) {
+    console.error('Error fetching playlist movies:', error);
+    throw error; // Rethrow the error for the caller to handle
+  }
+};
 

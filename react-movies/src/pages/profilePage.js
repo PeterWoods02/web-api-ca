@@ -4,6 +4,7 @@ import { Button, Typography, Container, Box, Snackbar } from "@mui/material";
 import RemoveFromPlaylist from "../components/cardIcons/removeFromPlaylist"; // Import the RemoveFromPlaylist component
 import PageTemplate from "../components/templateMovieListPageNoFilter"; // Import your PageTemplate
 import { jwtDecode } from "jwt-decode";
+import { getPlaylistMovies } from "../api/tmdb-api";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null); // State to store the logged-in user info
@@ -17,66 +18,45 @@ const ProfilePage = () => {
   const token = window.localStorage.getItem("token");
  
 
+  
   useEffect(() => {
     if (token) {
       try {
-        // Decode the token to get the user info (e.g., userId)
         const decoded = jwtDecode(token);
-        setUser(decoded); // Set the user data (like email or userId)
-
-        // Fetch the user's playlist movies based on the decoded user ID
-        getPlaylistMovies(); 
+        setUser(decoded);
+        fetchPlaylistMovies(); // Use the new function here
       } catch (error) {
         console.error("Error decoding token: ", error);
         setLoading(false);
       }
     } else {
-      // Redirect to login page if no token exists
       navigate("/movies/homePageLogIn");
     }
   }, [navigate, token]);
 
-  // Function to get the user's playlist movies (from an API or backend)
-  const getPlaylistMovies = async () => {
+  const fetchPlaylistMovies = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/users/playlist/`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-  
-      if (!response.ok) {
-        console.error(`Failed to fetch movies. Status: ${response.status}`);
-        throw new Error('Failed to fetch movies');
-      }
-  
-     
-      const data = await response.json();
-      // Set movies data to state
-      setMovies(data.playlist || []);
-      setLoading(false);
+      const playlist = await getPlaylistMovies();
+      setMovies(playlist);
     } catch (error) {
-      console.error('Error fetching movies:', error);
+      console.error("Error fetching playlist movies:", error);
+      setSnackbarMessage("Error fetching playlist movies.");
+      setSnackbarOpen(true);
+    } finally {
       setLoading(false);
     }
   };
 
-  
-  // Function to log out
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove JWT from localStorage
-    setUser(null); // Clear user data
-    navigate("/movies/homePageLogIn"); // Redirect to login page
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/movies/homePageLogIn");
   };
 
-  // Function to handle snackbar close
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
 
-  // Function to show snackbar after movie is removed
   const showSnackbar = (message) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
@@ -102,7 +82,7 @@ const ProfilePage = () => {
             <Typography variant="h4" gutterBottom sx={{ color: "#bb86fc", fontWeight: 700 }}>
               Profile Page
             </Typography>
-            <Typography variant="h6">Welcome, {user.email || "User"}!</Typography>
+            <Typography variant="h6">Welcome, {user.username || "User"}!</Typography>
           </Box>
 
           <Typography variant="h6" gutterBottom>
@@ -123,28 +103,25 @@ const ProfilePage = () => {
             Log Out
           </Button>
 
-          {/* Use PageTemplate to display movies */}
           <PageTemplate
             title="My Playlist"
-            movies={movies} // Pass the movies array to the PageTemplate
+            movies={movies}
             action={(movie) => (
               <RemoveFromPlaylist
-                movieId={movie.id} 
-                getPlaylist={getPlaylistMovies}
-                showSnackbar={showSnackbar} 
+                movieId={movie.id}
+                getPlaylist={fetchPlaylistMovies}
+                showSnackbar={showSnackbar}
               />
             )}
           />
 
-            {/* Snackbar to show the success message */}
-            <Snackbar
+          <Snackbar
             open={snackbarOpen}
             autoHideDuration={2000}
             message={snackbarMessage}
             onClose={handleSnackbarClose}
             anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           />
-
         </>
       ) : (
         <Typography variant="body1">Please log in to see your playlist.</Typography>

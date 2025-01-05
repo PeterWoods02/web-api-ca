@@ -1,6 +1,7 @@
 import express from 'express';
 import User from './userModel';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 const router = express.Router(); // eslint-disable-line
 
@@ -31,20 +32,56 @@ router.get('/', async (req, res) => {
   res.status(200).json(users);
 });
 
-// Get user details by userId
+
 router.get('/:userId', async (req, res) => {
-  const { userId } = req.params;  
+  const { userId } = req.params;
+
   try {
+    // Convert userId to ObjectId if it's a valid string
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user); // Send the user details as JSON
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+router.get('/:userId/playlist', async (req, res) => {
+  const { userId } = req.params;
+  
+  // Validate if userId is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: 'Invalid userId format' });
+  }
+
+  try {
+    // Fetch the user by their ID and return the playlist
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.status(200).json(user);  
+    
+    // Assuming the playlist is a field in the user schema
+    res.status(200).json(user.playlist);
   } catch (error) {
-    console.error('Error fetching user details:', error);
-    res.status(500).json({ message: 'Error fetching user details', error: error.message });
+    console.error('Error fetching playlist:', error);
+    res.status(500).json({ message: 'Error fetching playlist', error: error.message });
   }
 });
+
+
 
 // Register User
 router.post('/signup', async (req, res) => {

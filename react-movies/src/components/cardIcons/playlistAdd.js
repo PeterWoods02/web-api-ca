@@ -15,7 +15,7 @@ const AddPlaylistAddIcon = ({ movie }) => {
   const { isAuthenticated, userName } = useContext(AuthContext);
   
 
-  // Mock function for adding movie to the playlist (you can replace this later with Firebase functionality)
+ 
   const addToPlaylist = async (movie) => {
     const token = localStorage.getItem('token');
     try {
@@ -64,7 +64,7 @@ const AddPlaylistAddIcon = ({ movie }) => {
       if (error.message === "Movie already in playlist") {
         setErrorMessage("This movie is already in your playlist.");
       } else {
-        setErrorMessage("Error adding to playlist. Please try again.");
+        setErrorMessage("This movie is already in your playlist.");
       }
       setOpenSnackbar(true);
   }
@@ -91,7 +91,7 @@ const AddPlaylistAddIcon = ({ movie }) => {
           severity={isError ? "error" : "success"}
           sx={{ width: "100%" }}
         >
-          {errorMessage || isError ? "Error adding to playlist!" : "Movie added to playlist!"}
+          {errorMessage || isError ? "This movie is already in your playlist!" : "Movie added to playlist!"}
         </Alert>
       </Snackbar>
     </div>

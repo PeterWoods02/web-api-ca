@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Container, Box, Button, Snackbar } from "@mui/material";
-import { getUserDetails, getUserReviews } from "../api/tmdb-api"; // Assume these functions exist
+import { Typography, Container, Box, Snackbar } from "@mui/material";
+import { getUserDetails, getUserRatings } from "../api/tmdb-api"; // Assuming getUserRatings is a new function for the ratings API
 
 const UserReviewPage = () => {
   const { userId } = useParams(); // Get the userId from URL parameters
@@ -14,26 +14,23 @@ const UserReviewPage = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const user = await getUserDetails(userId); // Fetch user details by userId
-        const reviews = await getUserReviews(userId); // Fetch all reviews by userId
-        
-        
+        const user = await getUserDetails(userId); // Get user details (optional)
         setUserDetails(user);
+  
+        const reviews = await getUserRatings(userId); // Fetch reviews
         setUserReviews(reviews);
-        
       } catch (error) {
         console.error("Error fetching user details or reviews:", error);
-        setSnackbarMessage("Error fetching user details or reviews");
+        setSnackbarMessage(error.message || 'Error fetching user details or reviews');
         setSnackbarOpen(true);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchUserProfile();
   }, [userId]);
-
-
+  
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
@@ -46,7 +43,6 @@ const UserReviewPage = () => {
       ) : userDetails ? (
         <>
           <Box sx={{ marginBottom: 6 }} />
-
           <Box
             sx={{
               display: "flex",
@@ -75,7 +71,7 @@ const UserReviewPage = () => {
               userReviews.map((review) => (
                 <Box key={review._id} sx={{ marginBottom: 2, padding: "8px", backgroundColor: "#333333", borderRadius: "8px" }}>
                   <Typography variant="h6" sx={{ color: "#bb86fc" }}>
-                    {review.movieTitle} 
+                    {review.movieTitle}
                   </Typography>
                   <Typography variant="body1" sx={{ color: "#ffffff" }}>
                     {review.review}

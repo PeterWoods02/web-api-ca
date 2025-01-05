@@ -88,18 +88,19 @@ const MovieDetails = ({ movie }) => {  // Don't miss this!
       </Paper>
       
       <Fab
-        color="secondary"
-        variant="extended"
-        onClick={() =>setDrawerOpen(true)}
-        sx={{
-          position: 'fixed',
-          bottom: '1em',
-          right: '1em'
-        }}
-      >
-        <NavigationIcon />
-        Reviews
-      </Fab>
+      color="secondary"
+      variant="extended"
+      onClick={() => navigate(`/rating/${movie.id}`)} // Navigate to the desired route
+      sx={{
+        position: "fixed",
+        bottom: "1em",
+        right: "1em",
+      }}
+    >
+      <NavigationIcon />
+      Reviews
+    </Fab>
+
       <Drawer anchor="top" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <MovieReviews movie={movie} />
       </Drawer>
