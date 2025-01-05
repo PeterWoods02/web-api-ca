@@ -270,3 +270,17 @@ export const getMovieDetails = async (movieId) => {
   return data;
 };
 
+// Function to fetch the ratings data from the API
+const getMyUserRatings = async (movieId) => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/rating/${movieId}`);
+    const data = await response.json();
+    return data.ratings; // Returning the ratings array
+  } catch (error) {
+    console.error("Error fetching ratings:", error);
+    return [];
+  }
+};
+
+
+

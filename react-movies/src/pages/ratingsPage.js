@@ -71,6 +71,21 @@ const RatingsPage = () => {
       setSnackbarOpen(true);
     }
   };
+
+  const calculateCombinedAverage = () => {
+    const allRatings = ratings.map((r) => r.rating); // Extract all user ratings
+    const totalRatings = allRatings.reduce((acc, val) => acc + val, 0); // Sum all the ratings
+    const userRatingCount = allRatings.length;
+    const movieRatingCount = movieRatings.vote_count;
+  
+    // Combine the movie ratings and user ratings
+    const combinedRatingCount = userRatingCount + movieRatingCount;
+    const combinedTotalRating = totalRatings + movieRatings.vote_average * movieRatingCount;
+  
+    if (combinedRatingCount === 0) return 0; // Prevent division by zero
+    return combinedTotalRating / combinedRatingCount; // Return the combined average rating
+  };
+  
   
      // Trigger ratings refresh after a rating is submitted
   const refreshRatings = () => {
@@ -121,10 +136,10 @@ const RatingsPage = () => {
           {/* Display the movie's vote count and average */}
             <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
               <Typography variant="body1" sx={{ color: "#ffffff", marginRight: 2 }}>
-                Vote Count: {movieRatings.vote_count}
+                Vote Count: {movieRatings.vote_count + ratings.length}
               </Typography>
               <Typography variant="body1" sx={{ color: "#ffffff" }}>
-                Average Rating: {movieRatings.vote_average.toFixed(1)}
+                Average Rating: {calculateCombinedAverage().toFixed(1)}
               </Typography>
             </Box>
           </Box>
