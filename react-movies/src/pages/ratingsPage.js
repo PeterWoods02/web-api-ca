@@ -73,16 +73,16 @@ const RatingsPage = () => {
   };
 
   const calculateCombinedAverage = () => {
-    const allRatings = ratings.map((r) => r.rating); // Extract all user ratings
-    const totalRatings = allRatings.reduce((acc, val) => acc + val, 0); // Sum all the ratings
+    const allRatings = ratings.map((r) => r.rating);
+    const totalRatings = allRatings.reduce((acc, val) => acc + val, 0); 
     const userRatingCount = allRatings.length;
     const movieRatingCount = movieRatings.vote_count;
   
-    // Combine the movie ratings and user ratings
+    // combine both ratings
     const combinedRatingCount = userRatingCount + movieRatingCount;
     const combinedTotalRating = totalRatings + movieRatings.vote_average * movieRatingCount;
   
-    if (combinedRatingCount === 0) return 0; // Prevent division by zero
+    if (combinedRatingCount === 0) return 0; // dont allow 0 total
     return combinedTotalRating / combinedRatingCount; // Return the combined average rating
   };
   
