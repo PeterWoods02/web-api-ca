@@ -56,6 +56,7 @@ const UserReviewPage = () => {
             <Typography variant="h4" gutterBottom sx={{ color: "#bb86fc", fontWeight: 700 }}>
               {userDetails.username || "Unknown User"}
             </Typography>
+
             <Typography variant="body1" sx={{ color: "#ffffff", marginBottom: 2 }}>
               Total Reviews: {userReviews.length}
             </Typography>

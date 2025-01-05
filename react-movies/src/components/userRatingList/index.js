@@ -1,8 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, Avatar, Typography, Box, Button } from "@mui/material";
 
+// Function to check if a user exists by their ID
+const checkIfUserExists = async (userId) => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/users/${userId}`);
+    return response.ok; // If the response is OK, the user exists
+  } catch (error) {
+    console.error("Error checking if user exists:", error);
+    return false; // If there's an error, assume the user doesn't exist
+  }
+};
+
 const UserRatingsList = ({ ratings }) => {
+  const [userExistsMap, setUserExistsMap] = useState({});
+
+  useEffect(() => {
+    const checkUsersExistence = async () => {
+      // Create a map of userId -> exists (true/false)
+      const map = {};
+      for (let rating of ratings) {
+        const exists = await checkIfUserExists(rating.userId);
+        map[rating.userId] = exists;
+      }
+      setUserExistsMap(map);
+    };
+
+    checkUsersExistence();
+  }, [ratings]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {ratings.map((rating) => (
@@ -10,10 +37,17 @@ const UserRatingsList = ({ ratings }) => {
           {/* Profile picture and user info */}
           <Avatar sx={{ width: 56, height: 56, backgroundColor: "#bb86fc" }} />
           <Box sx={{ marginLeft: 2, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          <Link to={`/user/${rating.userId}`}>
-            <Typography variant="body1" sx={{ color: "#fff", fontWeight: 600 }}>
-              {rating.userId ? rating.userId : "Anonymous"} {/* Fallback username will add real username later */}
-            </Typography></Link>
+            {userExistsMap[rating.userId] ? (
+              <Link to={`/rating/user/${rating.userId}`}>
+                <Typography variant="body1" sx={{ color: "#fff", fontWeight: 600 }}>
+                  {rating.userId || "Anonymous"}
+                </Typography>
+              </Link>
+            ) : (
+              <Typography variant="body1" sx={{ color: "#fff", fontWeight: 600 }}>
+                {rating.userId || "Anonymous"}
+              </Typography>
+            )}
             <Typography variant="body2" sx={{ color: "#bbb" }}>
               Rating: {rating.rating} / 10
             </Typography>

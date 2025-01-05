@@ -63,14 +63,15 @@ const App = () => {
                 <Route path="/actor/:actorId/movies" element={<ActorMoviePage />} />
                 <Route path="*" element={<Navigate to="/" />} />
                 <Route path="/reviews/form" element={<AddMovieReviewPage />} />
-               
+                <Route path="/rating/user/:userId" element={<UserProfilePage />} />
 
                 {/* Protected Routes */}
                 <Route element={<PrivateRoute />}>
                   <Route path="/movies/home" element={<HomePage />} />
                   <Route path="/movies/favorites" element={<FavoriteMoviesPage />} />
                   <Route path="/rating/:id" element={<RatingPage />} />
-                  <Route path="/user/:userId" element={<UserProfilePage />} />
+                  
+                  
                 </Route>
 
               </Routes>
