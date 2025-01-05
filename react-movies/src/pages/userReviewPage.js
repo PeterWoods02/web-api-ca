@@ -16,8 +16,11 @@ const UserReviewPage = () => {
       try {
         const user = await getUserDetails(userId); // Fetch user details by userId
         const reviews = await getUserReviews(userId); // Fetch all reviews by userId
+        
+        
         setUserDetails(user);
         setUserReviews(reviews);
+        
       } catch (error) {
         console.error("Error fetching user details or reviews:", error);
         setSnackbarMessage("Error fetching user details or reviews");
@@ -29,6 +32,8 @@ const UserReviewPage = () => {
 
     fetchUserProfile();
   }, [userId]);
+
+
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
@@ -70,7 +75,7 @@ const UserReviewPage = () => {
               userReviews.map((review) => (
                 <Box key={review._id} sx={{ marginBottom: 2, padding: "8px", backgroundColor: "#333333", borderRadius: "8px" }}>
                   <Typography variant="h6" sx={{ color: "#bb86fc" }}>
-                    {review.movieTitle}
+                    {review.movieTitle} 
                   </Typography>
                   <Typography variant="body1" sx={{ color: "#ffffff" }}>
                     {review.review}

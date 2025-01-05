@@ -1,6 +1,7 @@
 import express from 'express';
 import Rating from './ratingModel';
 import jwt from 'jsonwebtoken';
+import {getMovieTitle} from '../tmdb-api';
 
 
 const router = express.Router(); // eslint-disable-line
@@ -61,18 +62,20 @@ router.post('/rating', verifyToken, async (req, res) => {
     }
   
     try {
+      const movieTitle = await getMovieTitle(movieId);
       let existingRating = await Rating.findOne({ movieId, userId });
   
       if (existingRating) {
         // If rating already exists, update it with the review as well
         existingRating.rating = rating;
-        existingRating.review = review || existingRating.review;  // Update review if provided
+        existingRating.review = review || existingRating.review;  
+        existingRating.movieTitle = movieTitle;
         await existingRating.save();
         return res.status(200).json({ message: 'Rating updated successfully', rating: existingRating });
       }
   
       // If no existing rating, create a new one with the review
-      const newRating = new Rating({ movieId, userId, rating, review });
+      const newRating = new Rating({ movieId, userId, rating, review, movieTitle});
       await newRating.save();
       
       return res.status(201).json({ message: 'Rating added successfully', rating: newRating });

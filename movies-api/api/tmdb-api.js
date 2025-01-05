@@ -114,3 +114,11 @@ export const getMoviesForActor = async (actorId) => {
   const data = await fetchWithErrorHandling(url);
   return data.cast || [];
 };
+
+
+// Get movie title using movieId
+export const getMovieTitle = async (movieId) => {
+  const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-US`;
+  const movieData = await fetchWithErrorHandling(url);
+  return movieData.title || 'Unknown Movie'; // Return the movie title or a fallback if not found
+};
