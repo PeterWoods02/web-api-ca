@@ -6,7 +6,7 @@ import { Card, CardContent, Avatar, Typography, Box, Button } from "@mui/materia
 const checkIfUserExists = async (userId) => {
   try {
     const response = await fetch(`http://localhost:8080/api/users/${userId}`);
-    return response.ok; // If the response is OK, the user exists
+    return response.ok; 
   } catch (error) {
     console.error("Error checking if user exists:", error);
     return false; // If there's an error, assume the user doesn't exist

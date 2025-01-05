@@ -1,15 +1,30 @@
 import jwt from 'jsonwebtoken';
 import User from '../api/users/userModel';
 
+const publicRoutes = [
+    '/movies/home',
+    '/',
+    '/movies/homePageLogIn',
+    '/movies/upcoming',
+    '/movies/topRated',
+    '/movies/trending',
+    '/movies/profilePage',
+    '/movies/:id', 
+];
+
 const authenticate = async (request, response, next) => {
-    try { 
+    try {
+        // Check if the route is public
+        if (publicRoutes.some(route => request.path.startsWith(route))) {
+            return next(); // Bypass authentication for public routes
+        }
         const authHeader = request.headers.authorization;
         if (!authHeader) throw new Error('No authorization header');
 
         const token = authHeader.split(" ")[1];
         if (!token) throw new Error('Bearer token not found');
 
-        const decoded = await jwt.verify(token, process.env.SECRET); 
+        const decoded = await jwt.verify(token, process.env.SECRET);
         console.log(decoded);
 
         // Assuming decoded contains a username field
@@ -17,10 +32,11 @@ const authenticate = async (request, response, next) => {
         if (!user) {
             throw new Error('User not found');
         }
+
         // Optionally attach the user to the request for further use
-        request.user = user; 
+        request.user = user;
         next();
-    } catch(err) {
+    } catch (err) {
         next(new Error(`Verification Failed: ${err.message}`));
     }
 };

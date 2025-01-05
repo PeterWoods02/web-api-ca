@@ -18,6 +18,7 @@ const UpcomingMoviesPage = () => {
 
   const movies = upcomingMoviesData.results;
 
+  
   return (
     <PageTemplate
       title="Upcoming Movies"

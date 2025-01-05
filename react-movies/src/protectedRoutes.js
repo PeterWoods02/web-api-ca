@@ -1,16 +1,15 @@
-import React, { useContext } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { AuthContext } from './contexts/authContext'
+import React, { useContext } from 'react';
+import { Route, Navigate } from 'react-router-dom';
+import { AuthContext } from './contexts/authContext'; // assuming you have an AuthContext
 
-const ProtectedRoutes = () => {
-  const context = useContext(AuthContext);
-  const location = useLocation();
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated } = useContext(AuthContext); // or use any method you have to check authentication
 
-  return context.isAuthenticated ? (
-    <Outlet /> 
-  ) : (
-    <Navigate to='/login' replace state={{ from: location }} />
-  );
+  if (!isAuthenticated) {
+    return <Navigate to="/movies/homePageLogIn" />; // Redirect to login if not authenticated
+  }
+
+  return children; // Allow access to the protected route
 };
 
-export default ProtectedRoutes;
+export default PrivateRoute;

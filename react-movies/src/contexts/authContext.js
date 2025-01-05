@@ -1,7 +1,16 @@
 import React, { useState, createContext } from "react";
-import { signIn, signUp } from "../api/authApi.js"; // Ensure this matches your API setup
+import { signIn, signUp } from "../api/authApi.js"; 
 
-export const AuthContext = createContext(null);
+const defaultAuthContext = {
+  isAuthenticated: false,
+  authenticate: () => {},
+  register: () => {},
+  signout: () => {},
+  userName: "",
+  authToken: null
+};
+
+export const AuthContext = createContext(defaultAuthContext);
 
 const AuthContextProvider = (props) => {
   const existingToken = localStorage.getItem("token");
