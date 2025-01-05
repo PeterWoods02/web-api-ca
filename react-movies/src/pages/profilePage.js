@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Typography, Container, Box, Snackbar } from "@mui/material";
-import RemoveFromPlaylist from "../components/cardIcons/removeFromPlaylist"; // Import the RemoveFromPlaylist component
-import PageTemplate from "../components/templateMovieListPageNoFilter"; // Import your PageTemplate
+import RemoveFromPlaylist from "../components/cardIcons/removeFromPlaylist";
+import PageTemplate from "../components/templateMovieListPageNoFilter"; 
 import { jwtDecode } from "jwt-decode";
 import { getPlaylistMovies } from "../api/tmdb-api";
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null); // State to store the logged-in user info
-  const [movies, setMovies] = useState([]); // State to store the playlist movies
-  const [loading, setLoading] = useState(true); // State for loading
-  const [snackbarOpen, setSnackbarOpen] = useState(false); // State to control Snackbar visibility
-  const [snackbarMessage, setSnackbarMessage] = useState(""); // State to hold the Snackbar message
+  const [user, setUser] = useState(null); 
+  const [movies, setMovies] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [snackbarOpen, setSnackbarOpen] = useState(false); 
+  const [snackbarMessage, setSnackbarMessage] = useState(""); 
   const navigate = useNavigate();
 
   // Get JWT from localStorage
@@ -24,28 +24,41 @@ const ProfilePage = () => {
       try {
         const decoded = jwtDecode(token);
         setUser(decoded);
-        fetchPlaylistMovies(); // Use the new function here
+        console.log('Decoded user:', decoded); // Log the decoded user
+        fetchPlaylistMovies();
       } catch (error) {
-        console.error("Error decoding token: ", error);
+        console.error('Error decoding token: ', error);
         setLoading(false);
       }
     } else {
       navigate("/movies/homePageLogIn");
     }
   }, [navigate, token]);
-
+  
   const fetchPlaylistMovies = async () => {
+    console.log('Fetching playlist for user:', user.id);
     try {
-      const playlist = await getPlaylistMovies();
-      setMovies(playlist);
+      const playlist = await getPlaylistMovies(user.id);
+      console.log('Fetched playlist:', playlist); // Log the playlist directly
+      if (Array.isArray(playlist)) {
+        setMovies(playlist); // Set the movies array if it's an array
+      } else {
+        console.error('Fetched data is not an array:', playlist);
+        setMovies([]); // Set empty array if it's not an array
+      }
     } catch (error) {
-      console.error("Error fetching playlist movies:", error);
+      console.error('Error fetching playlist movies:', error);
       setSnackbarMessage("Error fetching playlist movies.");
       setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
   };
+  
+  
+  
+
+  
 
   const handleLogout = () => {
     localStorage.removeItem("token");

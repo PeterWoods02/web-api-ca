@@ -186,7 +186,7 @@ router.delete('/playlist/:movieId', verifyToken, async (req, res) => {
 
 
 // Get all movies in the user's playlist
-router.get('/playlist', verifyToken, async (req, res) => {
+router.get('/:userId/playlist', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 

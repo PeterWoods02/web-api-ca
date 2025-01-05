@@ -309,16 +309,14 @@ export const getUserRatings = async (userId) => {
   };
   
   
-  
-
 
 // Fetch playlist movies function
-export const getPlaylistMovies = async () => {
+export const getPlaylistMovies = async (userId) => {
   try {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('No token found');
 
-    const response = await fetch(`http://localhost:8080/api/users/playlist/`, {
+    const response = await fetch(`http://localhost:8080/api/users/${userId}/playlist/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -331,10 +329,14 @@ export const getPlaylistMovies = async () => {
     }
 
     const data = await response.json();
-    return data.playlist || []; // Return the playlist array
+    console.log('Fetched playlist data:', data); 
+    return data; 
   } catch (error) {
     console.error('Error fetching playlist movies:', error);
-    throw error; // Rethrow the error for the caller to handle
+    throw error;
   }
 };
+
+
+
 
