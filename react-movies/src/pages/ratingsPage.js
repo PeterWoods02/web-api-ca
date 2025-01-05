@@ -4,6 +4,8 @@ import { Button, Typography, Container, Box, Snackbar } from "@mui/material";
 import { jwtDecode } from "jwt-decode";
 import RatingCard from "../components/userRatingList"; 
 import RatingForm from "../components/ratingForm"; 
+import { getMovieRatingsFromUsers, getMovieDetails, getMovieRatings}  from "../api/tmdb-api";
+
 
 const RatingsPage = () => {
   const { id } = useParams(); 
@@ -12,6 +14,7 @@ const RatingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false); 
   const [snackbarMessage, setSnackbarMessage] = useState(""); 
+  const [movieRatings, setMovieRatings] = useState({ vote_count: 0, vote_average: 0 }); 
   const navigate = useNavigate(); 
   const [title, setMovieName] = useState("");
 
@@ -24,9 +27,11 @@ const RatingsPage = () => {
         const decoded = jwtDecode(token);
         setUser(decoded); // Set the user data
 
+        
         // Fetch movie ratings based on the movieId from URL
-        getMovieRatings();
-        getMovieDetails();
+        
+        getMovieDetailsAndRatings(id); 
+        getUserRatings(id);
       } catch (error) {
         console.error("Error decoding token:", error);
         setLoading(false);
@@ -37,52 +42,29 @@ const RatingsPage = () => {
     }
   }, [navigate, token, id]);
 
-  
 
-    // Fetch ratings for the movie
-    const getMovieRatings = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          if (!token) throw new Error("No authentication token found.");
-          
-          const response = await fetch(`http://localhost:8080/api/rating/${id}`, {
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          });
-      
-          if (!response.ok) throw new Error(`Failed to fetch ratings: ${response.statusText}`);
-          
-          const { ratings = [] } = await response.json();
-          setRatings(ratings);
-        } catch (error) {
-          console.error("Error fetching ratings:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      
-      const getMovieDetails = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("No authentication token found.");
-            
-            const response = await fetch(`http://localhost:8080/api/movies/${id}`, {
-              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            });
-        
-            if (!response.ok) throw new Error(`Failed to fetch ratings: ${response.statusText}`);
-            
-    
-          const data = await response.json();
-            const movieTitle = data.title;
-            setMovieName(movieTitle);
-        } catch (error) {
-          console.error("Error fetching movie details:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-    
+   // get title and ratings
+  const getMovieDetailsAndRatings = async (movieId) => {
+    try {
+      const details = await getMovieDetails(movieId); 
+      const ratingsData = await getMovieRatings(movieId); 
+      setMovieName(details.title); 
+      setMovieRatings(ratingsData); 
+    } catch (error) {
+      console.error("Error fetching movie details or ratings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  // Fetch user ratings for the movie
+  const getUserRatings = async (movieId) => {
+    try {
+      const userRatings = await getMovieRatingsFromUsers(movieId);
+      setRatings(userRatings); // Set the ratings from users
+    } catch (error) {
+      console.error("Error fetching user ratings:", error);
+    }
+  };
      
   // Handle closing of the Snackbar
   const handleSnackbarClose = () => {
@@ -123,6 +105,17 @@ const RatingsPage = () => {
             <Typography variant="h4" gutterBottom sx={{ color: "#bb86fc", fontWeight: 700 }}>
             {title || "Loading..."} 
           </Typography>
+
+
+          {/* Display the movie's vote count and average */}
+            <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+              <Typography variant="body1" sx={{ color: "#ffffff", marginRight: 2 }}>
+                Vote Count: {movieRatings.vote_count}
+              </Typography>
+              <Typography variant="body1" sx={{ color: "#ffffff" }}>
+                Average Rating: {movieRatings.vote_average.toFixed(1)}
+              </Typography>
+            </Box>
           </Box>
 
            
@@ -143,7 +136,7 @@ const RatingsPage = () => {
           </Button>
 
           {/* RatingForm component for submitting new ratings */}
-          <RatingForm movieId={id} fetchRatings={getMovieRatings} showSnackbar={showSnackbar} />
+          <RatingForm movieId={id} fetchRatings={getMovieRatingsFromUsers} showSnackbar={showSnackbar} />
 
           <Box sx={{ marginBottom: 6 }} />   
 

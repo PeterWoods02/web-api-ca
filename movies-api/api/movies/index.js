@@ -153,6 +153,25 @@ router.get('/tmdb/actors/:id', asyncHandler(async (req, res) => {
       res.status(500).json({ message: 'Error fetching movie actors', error: error.message });
     }
   }));
+
+  // Get vote avaerage and number of votes from tmdb
+router.get('/:id/ratings', asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const tmdbMovie = await getMovie(id); 
+        if (tmdbMovie) {
+            return res.status(200).json({
+                vote_count: tmdbMovie.vote_count,
+                vote_average: tmdbMovie.vote_average,
+            });
+        }
+        res.status(200).json(movies);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching movie ratings', error: error.message });
+    }
+  }));
+
   
 
 

@@ -214,3 +214,59 @@ export const getMoviesForActor = async (actorId) => {
   }
   return response.json();
 };
+
+
+export const getMovieRatings = async (movieId) => {
+  const response = await fetch(`http://localhost:8080/api/movies/${movieId}/ratings`, {
+    headers: {
+      'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(await response.json().message);
+  }
+
+  return response.json(); 
+};
+
+
+
+// Get movie ratings from users
+export const getMovieRatingsFromUsers = async (movieId) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found.");
+
+  const response = await fetch(`http://localhost:8080/api/rating/${movieId}`, {
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+  });
+
+  if (!response.ok) throw new Error(`Failed to fetch ratings: ${response.statusText}`);
+
+  const { ratings = [] } = await response.json();
+  return ratings;
+};
+
+
+
+// Get movie details by ID
+export const getMovieDetails = async (movieId) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found.");
+
+  const response = await fetch(`http://localhost:8080/api/movies/${movieId}`, {
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+  });
+
+  if (!response.ok) throw new Error(`Failed to fetch movie details: ${response.statusText}`);
+
+  const data = await response.json();
+  return data;
+};
+
