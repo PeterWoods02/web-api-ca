@@ -81,7 +81,7 @@ const UserReviewPage = () => {
                     {review.review}
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#ffffff" }}>
-                    Rating: {review.rating}
+                    Rating: {review.rating}/10
                   </Typography>
                 </Box>
               ))

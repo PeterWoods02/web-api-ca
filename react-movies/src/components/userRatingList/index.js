@@ -21,8 +21,8 @@ const UserRatingsList = ({ ratings }) => {
       // Create a map of userId -> exists (true/false)
       const map = {};
       for (let rating of ratings) {
-        const exists = await checkIfUserExists(rating.userId);
-        map[rating.userId] = exists;
+        const exists = await checkIfUserExists(rating.userId._id); 
+        map[rating.userId._id] = exists;
       }
       setUserExistsMap(map);
     };
@@ -37,15 +37,15 @@ const UserRatingsList = ({ ratings }) => {
           {/* Profile picture and user info */}
           <Avatar sx={{ width: 56, height: 56, backgroundColor: "#bb86fc" }} />
           <Box sx={{ marginLeft: 2, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            {userExistsMap[rating.userId] ? (
-              <Link to={`/rating/user/${rating.userId}`}>
+            {userExistsMap[rating.userId._id]  ? (
+              <Link to={`/rating/user/${rating.userId._id}`}>
                 <Typography variant="body1" sx={{ color: "#fff", fontWeight: 600 }}>
-                  {rating.userId || "Anonymous"}
+                  {rating.userId.username || "Anonymous"}
                 </Typography>
               </Link>
             ) : (
               <Typography variant="body1" sx={{ color: "#fff", fontWeight: 600 }}>
-                {rating.userId || "Anonymous"}
+                {rating.userId.username || "Anonymous"}
               </Typography>
             )}
             <Typography variant="body2" sx={{ color: "#bbb" }}>

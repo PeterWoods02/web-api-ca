@@ -34,7 +34,9 @@ router.get('/rating/:movieId', async (req, res) => {
       return res.status(400).json({ message: 'MovieId is required' });
     }
     try {
-      const ratings = await Rating.find({ movieId });
+      const ratings = await Rating.find({ movieId })
+      .populate('userId', 'username')
+      .exec();
   
       if (!ratings || ratings.length === 0) {
         return res.status(404).json({ message: 'No ratings found for this movie' });
