@@ -1,6 +1,6 @@
 import React, { useState, createContext } from "react";
 import { signIn, signUp } from "../api/authApi.js";
-import { Snackbar, Alert } from "@mui/material";  
+import { Snackbar, Alert } from "@mui/material"; 
 
 const defaultAuthContext = {
   isAuthenticated: false,
@@ -48,10 +48,7 @@ const AuthContextProvider = (props) => {
     setOpenSnackbar(true);
   };
 
-  const authenticate = async (event, username, password) => {
-    // Prevent form submission if validation fails
-    event.preventDefault();
-
+  const authenticate = async (username, password) => {
     // Validate email and password
     if (!validateEmail(username)) {
       showSnackbar("Invalid email format.");
