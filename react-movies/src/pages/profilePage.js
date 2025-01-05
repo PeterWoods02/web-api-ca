@@ -24,7 +24,8 @@ const ProfilePage = () => {
           const decoded = jwtDecode(token);
           if (decoded && decoded.id) {
             setUser(decoded);
-            await fetchPlaylistMovies(decoded.id); // Fetch playlist after setting user
+            // Fetch playlist only when user data is available
+            await fetchPlaylistMovies(decoded.id);
           } else {
             console.error('User ID not found in token');
             navigate("/movies/homePageLogIn");
@@ -48,6 +49,12 @@ const ProfilePage = () => {
   }, [navigate, token]);
 
   const fetchPlaylistMovies = async (userId) => {
+    // Ensure userId is available before making the API call
+    if (!userId) {
+      console.error("User ID is undefined. Cannot fetch playlist.");
+      return;
+    }
+
     try {
       setLoading(true); // Set loading true before fetching
       const playlist = await getPlaylistMovies(userId); // Make sure user.id is available
@@ -65,6 +72,41 @@ const ProfilePage = () => {
       setMovies([]); // Set movies to empty on error
     } finally {
       setLoading(false); // Set loading to false when done
+    }
+  };
+
+  const handleRemoveMovie = async (movieId) => {
+    if (!user?.id) {
+      console.error("User ID is undefined. Cannot remove movie.");
+      return;
+    }
+
+    try {
+      // Remove the movie from the local state immediately for faster UI update
+      const updatedMovies = movies.filter((movie) => movie.id !== movieId);
+      setMovies(updatedMovies);
+
+      // Now call the API to remove the movie from the database
+      const response = await fetch(`http://localhost:8080/api/users/${user.id}/playlist/${movieId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to remove movie");
+      }
+
+      // Re-fetch the playlist to ensure the UI is in sync with the server
+      await fetchPlaylistMovies(user.id);
+
+      setSnackbarMessage("Movie removed successfully.");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error removing movie:", error);
+      setSnackbarMessage("Error removing movie.");
+      setSnackbarOpen(true);
     }
   };
 
@@ -132,6 +174,7 @@ const ProfilePage = () => {
                 movieId={movie.id}
                 getPlaylist={fetchPlaylistMovies} // Re-fetch the playlist after a change
                 showSnackbar={showSnackbar}
+                onRemove={() => handleRemoveMovie(movie.id)} // Handle remove on click
               />
             )}
           />
