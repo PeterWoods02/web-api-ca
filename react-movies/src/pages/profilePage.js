@@ -16,49 +16,57 @@ const ProfilePage = () => {
 
   // Get JWT from localStorage
   const token = window.localStorage.getItem("token");
- 
 
-  
   useEffect(() => {
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser(decoded);
-        console.log('Decoded user:', decoded); // Log the decoded user
-        fetchPlaylistMovies();
-      } catch (error) {
-        console.error('Error decoding token: ', error);
-        setLoading(false);
-      }
-    } else {
-      navigate("/movies/homePageLogIn");
-    }
-  }, [navigate, token]);
-  
-  const fetchPlaylistMovies = async () => {
-    console.log('Fetching playlist for user:', user.id);
-    try {
-      const playlist = await getPlaylistMovies(user.id);
-      console.log('Fetched playlist:', playlist); // Log the playlist directly
-      if (Array.isArray(playlist)) {
-        setMovies(playlist); // Set the movies array if it's an array
+    const fetchUserData = async () => {
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          if (decoded && decoded.id) {
+            setUser(decoded);
+            await fetchPlaylistMovies(decoded.id); // Fetch playlist after setting user
+          } else {
+            console.error('User ID not found in token');
+            navigate("/movies/homePageLogIn");
+          }
+        } catch (error) {
+          console.error("Error decoding token: ", error);
+          setLoading(false);
+        }
       } else {
-        console.error('Fetched data is not an array:', playlist);
-        setMovies([]); // Set empty array if it's not an array
+        navigate("/movies/homePageLogIn");
+      }
+    };
+
+    fetchUserData();
+
+    // Cleanup state on component unmount (reset loading and movies)
+    return () => {
+      setMovies([]);  // Reset movies on unmount
+      setLoading(true); // Reset loading on unmount
+    };
+  }, [navigate, token]);
+
+  const fetchPlaylistMovies = async (userId) => {
+    try {
+      setLoading(true); // Set loading true before fetching
+      const playlist = await getPlaylistMovies(userId); // Make sure user.id is available
+      if (playlist.length === 0) {
+        console.error("No movies found in the playlist");
+        setMovies([]);
+      } else {
+        setMovies(playlist);
+        console.log("Fetched playlist:", playlist); // Log the movies that were fetched
       }
     } catch (error) {
-      console.error('Error fetching playlist movies:', error);
+      console.error("Error fetching playlist movies:", error);
       setSnackbarMessage("Error fetching playlist movies.");
       setSnackbarOpen(true);
+      setMovies([]); // Set movies to empty on error
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading to false when done
     }
   };
-  
-  
-  
-
-  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -122,7 +130,7 @@ const ProfilePage = () => {
             action={(movie) => (
               <RemoveFromPlaylist
                 movieId={movie.id}
-                getPlaylist={fetchPlaylistMovies}
+                getPlaylist={fetchPlaylistMovies} // Re-fetch the playlist after a change
                 showSnackbar={showSnackbar}
               />
             )}

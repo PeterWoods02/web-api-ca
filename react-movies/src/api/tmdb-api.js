@@ -309,6 +309,9 @@ export const getUserRatings = async (userId) => {
   };
   
   
+  
+
+
 
 // Fetch playlist movies function
 export const getPlaylistMovies = async (userId) => {
@@ -329,8 +332,8 @@ export const getPlaylistMovies = async (userId) => {
     }
 
     const data = await response.json();
-    console.log('Fetched playlist data:', data); 
-    return data; 
+    console.log('Fetched playlist data:', data); // Log the entire response to inspect it
+    return data; // Assuming the data is already the array of movies
   } catch (error) {
     console.error('Error fetching playlist movies:', error);
     throw error;
