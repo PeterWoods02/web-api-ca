@@ -56,16 +56,27 @@ const RatingsPage = () => {
       setLoading(false);
     }
   };
-  // Fetch user ratings for the movie
+
+
   const getUserRatings = async (movieId) => {
     try {
       const userRatings = await getMovieRatingsFromUsers(movieId);
-      setRatings(userRatings); // Set the ratings from users
+      if (!userRatings) {
+        throw new Error("No ratings found for this movie");
+      }
+      setRatings(userRatings);
     } catch (error) {
       console.error("Error fetching user ratings:", error);
+      setSnackbarMessage("Error fetching ratings");
+      setSnackbarOpen(true);
     }
   };
-     
+  
+     // Trigger ratings refresh after a rating is submitted
+  const refreshRatings = () => {
+    getUserRatings(id); // Re-fetch the updated ratings
+  };
+  
   // Handle closing of the Snackbar
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
@@ -136,7 +147,7 @@ const RatingsPage = () => {
           </Button>
 
           {/* RatingForm component for submitting new ratings */}
-          <RatingForm movieId={id} fetchRatings={getMovieRatingsFromUsers} showSnackbar={showSnackbar} />
+          <RatingForm movieId={id} fetchRatings={() => getMovieRatingsFromUsers(id)} refreshRatings={refreshRatings} showSnackbar={showSnackbar} />
 
           <Box sx={{ marginBottom: 6 }} />   
 

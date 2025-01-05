@@ -3,7 +3,7 @@ import { TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
-const RatingForm = ({  movieId, fetchRatings, showSnackbar  }) => {
+const RatingForm = ({  movieId, refreshRatings, showSnackbar  }) => {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [error, setError] = useState("");
@@ -46,7 +46,7 @@ const RatingForm = ({  movieId, fetchRatings, showSnackbar  }) => {
   
         if (response.ok) {
           showSnackbar("Rating submitted successfully!");
-          fetchRatings(); // Refresh the ratings list
+          refreshRatings(); // Refresh the ratings list
           setRating(0); // Reset the form
           setReview("");
         } else {
