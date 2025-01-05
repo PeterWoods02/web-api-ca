@@ -81,5 +81,30 @@ router.post('/rating', verifyToken, async (req, res) => {
       return res.status(500).json({ message: 'Error adding/updating rating', error: error.message });
     }
   });
+
+    // Get all ratings for a specific user
+  router.get('/rating/user/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'UserId is required' });
+    }
+
+    try {
+      // Fetch ratings for the user by their userId
+      const ratings = await Rating.find({ userId });
+
+      if (!ratings || ratings.length === 0) {
+        return res.status(404).json({ message: 'No ratings found for this user' });
+      }
+
+      // Return the list of ratings
+      return res.status(200).json({ ratings });
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
+      return res.status(500).json({ message: 'Error fetching ratings', error: error.message });
+    }
+  });
+
   
   export default router;

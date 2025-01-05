@@ -14,6 +14,7 @@ import MoviesContextProvider from "./contexts/moviesContext";
 import AddMovieReviewPage from './pages/addMovieReviewPage';
 import TopRatedMovies from "./pages/topRatesMovies";
 import TrendingMovies from "./pages/trendingMovies";
+import UserProfilePage from "./pages/userReviewPage";
 import AllMovies from "./pages/allMovies";
 import RecommendedMovies from "./components/recommendedMovies"; 
 import MovieActors from "./components/movieActors"; 
@@ -69,6 +70,7 @@ const App = () => {
                   <Route path="/movies/home" element={<HomePage />} />
                   <Route path="/movies/favorites" element={<FavoriteMoviesPage />} />
                   <Route path="/rating/:id" element={<RatingPage />} />
+                  <Route path="/user/:userId" element={<UserProfilePage />} />
                 </Route>
 
               </Routes>

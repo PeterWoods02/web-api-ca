@@ -270,17 +270,35 @@ export const getMovieDetails = async (movieId) => {
   return data;
 };
 
-// Function to fetch the ratings data from the API
-const getMyUserRatings = async (movieId) => {
-  try {
-    const response = await fetch(`http://localhost:8080/api/rating/${movieId}`);
-    const data = await response.json();
-    return data.ratings; // Returning the ratings array
-  } catch (error) {
-    console.error("Error fetching ratings:", error);
-    return [];
+
+
+
+// Get user details
+export const getUserDetails = async (userId) => {
+  const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
+    headers: {
+      'Authorization': `Bearer ${window.localStorage.getItem('token')}`
+    }
+  });
+  if (!response.ok) {
+    throw new Error(await response.json().message);
   }
+  const data = await response.json();
+  return data;
 };
 
+// Get user reviews
+export const getUserReviews = async (userId) => {
+  const response = await fetch(`http://localhost:8080/api/rating/user/${userId}`, {
+    headers: {
+      'Authorization': `Bearer ${window.localStorage.getItem('token')}`
+    }
+  });
+  if (!response.ok) {
+    throw new Error(await response.json().message);
+  }
+  const data = await response.json();
+  return data.ratings; 
+};
 
 
