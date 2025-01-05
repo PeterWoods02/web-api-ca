@@ -73,13 +73,15 @@ export const getMovieReviews = async (id) => {
 
 // Get upcoming movies from the backend
 export const getUpcomingMovies = async () => {
-  const url = 'http://localhost:8080/api/movies/tmdb/upcoming';  // Replace with the correct URL for your backend
-  const response = await fetch(url);
+  const response = await fetch('http://localhost:8080/api/movies/tmdb/upcoming', {
+    headers: {
+      'Authorization': `Bearer ${window.localStorage.getItem('token')}`
+    }
+  });
   if (!response.ok) {
-    throw new Error(`Error fetching movies: ${response.statusText}`);
+    throw new Error(await response.json().message);
   }
-  const data = await response.json();
-  return data;
+  return response.json();
 };
 
 // Get top-rated movies from the backend
