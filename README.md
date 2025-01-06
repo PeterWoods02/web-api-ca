@@ -76,6 +76,6 @@ JWT tokens for logged in users to access certain features last 1 day.
 
 I used React Query for managing API requests, caching, and data fetching. The integration involves fetching data from the Web API and providing it to various components in the app.
 The Web API is used to handle movie data, reviews, user authentication, ratings, and recommendations, instead of relying on an external API like TMDB (The Movie Database).
-For instance, movie details, reviews, ratings, and recommendations are fetched directly from the Web API using useQuery or useMutation hooks provided by React Query.
+For instance, movie details, reviews, ratings, and recommendations are fetched directly from the Web API using useQuery .
 
 
